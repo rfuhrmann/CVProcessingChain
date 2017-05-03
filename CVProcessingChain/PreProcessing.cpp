@@ -20,9 +20,9 @@ list<Mat> PreProcessing::run(Mat& img){
 	// Mat::zeros(img.size(), img.type());
 	images.push_back(img);
 	images.push_back(histogramEqualisation(img));
-	images.push_back(clahe(img));
-	images.push_back(nlmDenoising(img));
-	images.push_back(bilateralFiltering(img));
+	//images.push_back(clahe(img));
+	//images.push_back(nlmDenoising(img));
+	//images.push_back(bilateralFiltering(img));
 	return images;
 
 }
@@ -78,7 +78,7 @@ return      :  the blurred image
 Mat PreProcessing::nlmDenoising(Mat& img) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
-	fastNlMeansDenoising(img2, img2, 3, 7, 3); //prefered: 3,7,21
+	fastNlMeansDenoising(img2, img2, 3, 7, 5); //prefered: 3,7,21
 	return img2;
 }
 

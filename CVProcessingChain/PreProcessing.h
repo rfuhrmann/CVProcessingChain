@@ -8,7 +8,6 @@
 
 #include <iostream>
 #include<list>
-
 #include <opencv2/opencv.hpp>
 
 using namespace std;
