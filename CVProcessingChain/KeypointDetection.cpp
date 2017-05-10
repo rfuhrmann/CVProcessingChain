@@ -41,7 +41,7 @@ vector<Mat> KeypointDetection::run(Mat& img, const char* imageName, bool showIma
 img         :  input image
 return      :  the result image
 */
-void KeypointDetection::surf(Mat img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::surf(Mat img, const char* imageName, bool showImage, bool writeFile) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -59,10 +59,10 @@ void KeypointDetection::surf(Mat img, const char* imageName, bool showImage, boo
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
-		filename += "_surf.dat";
+		//filename += "_surf.dat";
 		writeKeypoints(filename.c_str(), keypoints);
 	}
-	//waitKey(0);
+	return keypoints;
 }
 
 // mser keypoint detection
@@ -71,7 +71,7 @@ void KeypointDetection::surf(Mat img, const char* imageName, bool showImage, boo
 img         :  input image
 return      :  the result image
 */
-void KeypointDetection::mser(Mat img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::mser(Mat img, const char* imageName, bool showImage, bool writeFile) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 
@@ -100,10 +100,10 @@ void KeypointDetection::mser(Mat img, const char* imageName, bool showImage, boo
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
-		filename += "_mser.dat";
+		//filename += "_mser.dat";
 		writeKeypoints(filename.c_str(), keypoints);
 	}
-	//waitKey(0);
+	return keypoints;
 }
 
 
@@ -113,7 +113,7 @@ void KeypointDetection::mser(Mat img, const char* imageName, bool showImage, boo
 img         :  input image
 return      :  the result image
 */
-void KeypointDetection::brisk(Mat img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::brisk(Mat img, const char* imageName, bool showImage, bool writeFile) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -129,10 +129,10 @@ void KeypointDetection::brisk(Mat img, const char* imageName, bool showImage, bo
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
-		filename += "_brisk.dat";
+		//filename += "_brisk.dat";
 		writeKeypoints(filename.c_str(), keypoints);
 	}
-	//waitKey(0);
+	return keypoints;
 }
 
 // freak keypoint detection
@@ -141,12 +141,12 @@ void KeypointDetection::brisk(Mat img, const char* imageName, bool showImage, bo
 img         :  input image
 return      :  the result image
 */
-void KeypointDetection::freak(Mat img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::freak(Mat img, const char* imageName, bool showImage, bool writeFile) {
 	//Mat img2 = img.clone();
 	//img2.convertTo(img2, CV_8UC1);
 	////-- Step 1: Detect the keypoints using SURF Detector
 	//Ptr<FREAK> detector = FREAK::create();
-	//vector<KeyPoint> keypoints;
+	vector<KeyPoint> keypoints;
 	//detector->detect(img2, keypoints);
 
 	//-- Show detected (drawn) keypoints
@@ -157,7 +157,7 @@ void KeypointDetection::freak(Mat img, const char* imageName, bool showImage, bo
 	//	filename += "_freak.dat";
 	//	writeKeypoints(filename.c_str(), keypoints);
 	//}
-	//waitKey(0);
+	return keypoints;
 }
   
 // Function prints keypoints to the std::cout (console)
@@ -190,7 +190,7 @@ void KeypointDetection::writeKeypoints(const char* filename, vector<KeyPoint> kp
 	}
 	f << kp[kpSize-1].pt.x << "-" << kp[kpSize-1].pt.y;
 	f.close();
-	cout << "writing " << filename/*.c_str()*/ << " done." << endl;
+	//cout << " > writing " << filename/*.c_str()*/ << " done." << endl;
 }
 
 // Function displays image with keypoints (after proper normalization)

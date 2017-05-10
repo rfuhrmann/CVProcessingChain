@@ -22,10 +22,10 @@ public:
 	~KeypointDetection(void){};
 	void test(void);
 	vector<Mat> run(Mat&, const char* imageName, bool showImage, bool writeFile);
-	void surf(Mat img, const char* imageName, bool showImage, bool writeFile);
-	void mser(Mat img, const char* imageName, bool showImage, bool writeFile);
-	void brisk(Mat img, const char* imageName, bool showImage, bool writeFile);
-	void freak(Mat img, const char* imageName, bool showImage, bool writeFile);
+	vector<KeyPoint> surf(Mat img, const char* imageName, bool showImage, bool writeFile);
+	vector<KeyPoint> mser(Mat img, const char* imageName, bool showImage, bool writeFile);
+	vector<KeyPoint> brisk(Mat img, const char* imageName, bool showImage, bool writeFile);
+	vector<KeyPoint> freak(Mat img, const char* imageName, bool showImage, bool writeFile);
 	void printKeypoints(vector<KeyPoint> kp);
 	void writeKeypoints(const char* filename, vector<KeyPoint> kp);// , String filename);
 	void showKeypoints(const char* win, Mat img, bool cut = true);
