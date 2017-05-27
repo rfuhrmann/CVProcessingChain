@@ -27,7 +27,6 @@ void Test::test(Mat& img1, Mat& img2, string wName)
 
 	//-- Step 1: Detect the keypoints using SURF Detector
 	int minHessian = 400;
-
 	//SurfFeatureDetector detector(minHessian);
 	Ptr<SURF> detector = SURF::create(minHessian);
 	vector<KeyPoint> keypoints_object, keypoints_scene;
@@ -66,7 +65,7 @@ void Test::test(Mat& img1, Mat& img2, string wName)
 
 	for (int i = 0; i < descriptors_object.rows; i++)
 	{
-		if (matches[i].distance < 3 * min_dist)
+		if (matches[i].distance < 300 * min_dist) //3*min
 		{
 			good_matches.push_back(matches[i]);
 		}
@@ -85,10 +84,10 @@ void Test::test(Mat& img1, Mat& img2, string wName)
 	drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
 		good_matches, img_matches, Scalar::all(-1), Scalar::all(-1));
 	//,	vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS
-	/*
+	
 	//-- Localize the object
-	std::vector<Point2f> obj;
-	std::vector<Point2f> scene;
+	vector<Point2f> obj;
+	vector<Point2f> scene;
 
 	for (int i = 0; i < good_matches.size(); i++)
 	{
@@ -107,6 +106,7 @@ void Test::test(Mat& img1, Mat& img2, string wName)
 	std::vector<Point2f> scene_corners(4);
 
 	perspectiveTransform(obj_corners, scene_corners, H);
+	//perspectiveTransform(obj, scene, H);
 
 	//-- Draw lines between the corners (the mapped object in the scene - image_2 )
 	line(img_matches, scene_corners[0] + Point2f(img_object.cols, 0), scene_corners[1] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
@@ -114,7 +114,7 @@ void Test::test(Mat& img1, Mat& img2, string wName)
 	line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
 	line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
 
-	*/
+	
 	//-- Show detected matches
 	//"Good Matches & Object detection"
 	imshow("test_surf_"+wName, img_matches);

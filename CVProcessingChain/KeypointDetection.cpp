@@ -41,7 +41,7 @@ vector<Mat> KeypointDetection::run(Mat& img, const char* imageName, bool showIma
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::surf(Mat img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool showImage, bool writeFile) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -71,7 +71,7 @@ vector<KeyPoint> KeypointDetection::surf(Mat img, const char* imageName, bool sh
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::mser(Mat img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool showImage, bool writeFile) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 
@@ -87,7 +87,7 @@ vector<KeyPoint> KeypointDetection::mser(Mat img, const char* imageName, bool sh
 	//}
 
 	//-- Step 1: Detect the keypoints using SURF Detector
-	int minHessian = 400;
+	//int minHessian = 400;
 	Ptr<MSER> detector = MSER::create();
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
@@ -113,7 +113,7 @@ vector<KeyPoint> KeypointDetection::mser(Mat img, const char* imageName, bool sh
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::brisk(Mat img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool showImage, bool writeFile) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -141,7 +141,7 @@ vector<KeyPoint> KeypointDetection::brisk(Mat img, const char* imageName, bool s
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::freak(Mat img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::freak(Mat& img, const char* imageName, bool showImage, bool writeFile) {
 	//Mat img2 = img.clone();
 	//img2.convertTo(img2, CV_8UC1);
 	////-- Step 1: Detect the keypoints using SURF Detector
@@ -160,6 +160,33 @@ vector<KeyPoint> KeypointDetection::freak(Mat img, const char* imageName, bool s
 	return keypoints;
 }
   
+// orb keypoint detection
+//Oriented FAST and Rotated BRIEF
+/*
+img         :  input image
+return      :  the result image
+*/
+vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+	Mat img2 = img.clone();
+	img2.convertTo(img2, CV_8UC1);
+	//-- Step 1: Detect the keypoints using SURF Detector
+	Ptr<ORB> detector = ORB::create();
+	vector<KeyPoint> keypoints;
+	detector->detect(img2, keypoints);
+
+	//-- Draw keypoints
+	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+
+	//-- Show detected (drawn) keypoints
+	if (showImage) imshow("Keypoints: " + String(imageName) + "_ORB", img2);
+	//-- (over)Write keypoints to file (create file if non exists)
+	if (writeFile) {
+		string filename = imageName;
+		writeKeypoints(filename.c_str(), keypoints);
+	}
+	return keypoints;
+}
+
 // Function prints keypoints to the std::cout (console)
 /*
 kp		   :  keypoints
@@ -199,7 +226,7 @@ win   :  Window name
 img   :  Image that shall be displayed
 cut   :  whether to cut or scale values outside of [0,255] range
 */
-void KeypointDetection::showKeypoints(const char* win, Mat img, bool cut) {
+void KeypointDetection::showKeypoints(const char* win, Mat& img, bool cut) {
 	Mat tmp = img.clone();
 	if (tmp.channels() == 1) {
 		if (cut) {

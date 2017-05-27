@@ -11,6 +11,7 @@
 #include "Controller.h"
 #include "PreProcessing.h"
 #include "KeypointDetection.h"
+#include "KeypointDescription.h"
 #include "Test.h"
 #include<list>
 #include<vector>
@@ -26,7 +27,7 @@ int main(int argc, char** argv) {
 	//Controller controller;
 	
 	//definition of used preprocessing methods
-	const string imageName[] = { "original", "histEqual" };
+	//const string imageName[] = { "original", "histEqual" };
 	//definition of used keypoint detectors
 	//const string kds[] = { "surf", "mser" };
 
@@ -48,7 +49,7 @@ int main(int argc, char** argv) {
     cout << "load image1" << endl;
     Mat img = imread(argv[1], 0);
     if (!img.data){
-      cout << "ERROR: original image not specified"  << endl;
+      cout << "ERROR: original image1 not specified"  << endl;
       cout << "Press enter to exit..."  << endl;
       cin.get();
       return -1;
@@ -57,7 +58,7 @@ int main(int argc, char** argv) {
 	cout << "load image2" << endl;
 	Mat img2 = imread(argv[2], 0);
 	if (!img2.data) {
-		cout << "ERROR: original image not specified" << endl;
+		cout << "ERROR: original image2 not specified" << endl;
 		cout << "Press enter to exit..." << endl;
 		cin.get();
 		return -1;
@@ -93,6 +94,7 @@ int main(int argc, char** argv) {
 	//	iList2.pop_front();
 	//}
 	
+	
 	// building a vector for keypoints for each image in iList1
 	vector<string> kVec = controller.getKeypointDetectors();
 	vector<vector<KeyPoint>> keyVector1;
@@ -102,6 +104,7 @@ int main(int argc, char** argv) {
 		if (controller.useMser()) keyVector1.push_back(keypointDetection.mser(iList1.front(), (pVec[i] + "_mser_1_.dat").c_str(), false, true));
 		if (controller.useBrisk()) keyVector1.push_back(keypointDetection.brisk(iList1.front(), (pVec[i] + "_brisk_1_.dat").c_str(), false, true));
 		if (controller.useFreak()) keyVector1.push_back(keypointDetection.freak(iList1.front(), (pVec[i] + "_freak_1_.dat").c_str(), false, true));
+		if (controller.useOrb()) keyVector1.push_back(keypointDetection.orb(iList1.front(), (pVec[i] + "_orb_1_.dat").c_str(), false, true));
 		iList1.pop_front();
 	}
 	// building a vector for keypoints for each image in iList2
@@ -112,20 +115,10 @@ int main(int argc, char** argv) {
 		if (controller.useMser()) keyVector2.push_back(keypointDetection.mser(iList2.front(), (pVec[i] + "_mser_2_.dat").c_str(), false, false));
 		if (controller.useBrisk()) keyVector2.push_back(keypointDetection.brisk(iList2.front(), (pVec[i] + "_brisk_2_.dat").c_str(), false, false));
 		if (controller.useFreak()) keyVector2.push_back(keypointDetection.freak(iList2.front(), (pVec[i] + "_freak_2_.dat").c_str(), false, false));
+		if (controller.useOrb()) keyVector1.push_back(keypointDetection.orb(iList2.front(), (pVec[i] + "_orb_2_.dat").c_str(), false, true));
 		iList2.pop_front();
 	}
-	cout << "keyPoint-pairs: " << keyVector1.size() << endl;
-	cout << " > done" << endl;
-	cout << "KeyPoint pt: " << keyVector1[0][0].pt << endl;
-	cout << "KeyPoint angle: " << keyVector1[0][0].angle << endl;
-	cout << "KeyPoint octave: " << keyVector1[0][0].octave << endl;
-	cout << "KeyPoint size: " << keyVector1[0][0].size << endl;
-	cout << "KeyPoint response: " << keyVector1[0][0].response << endl;
-	//cout << "keyVector1: " << keyVector1.size() << endl;
-	//cout << "keyVector2: " << keyVector2.size() << endl;
-	//vector<Mat> imageVector (preProcessing.run(img));
-	//list<Mat> imageList(preProcessing.run(img));
-	//vector<vector<Mat>> keypointVector;
+
 
 	//number of preprocessing images including original image
 	//int kvSize = keypointVector.size();
@@ -137,7 +130,7 @@ int main(int argc, char** argv) {
 	//}
 
 	////match keypoints trial
-	////read file1 # # # # # # # # # # # # uuuuuu# # # # # # # # # # # # # # # # # # # # # # # # # # # #
+	////read file1 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 	//string image3;
 	//ifstream ifImage3 ("image3_kp.dat");
 	//if (ifImage3.is_open()) {
@@ -191,11 +184,37 @@ int main(int argc, char** argv) {
 	//cout << "Hits image3 - surf: " << hitsSurf << endl;
 	//Mat h = findHomography(vecImage3, vecImage3, CV_RANSAC);
 
-	Test test;
-	test.test(img, img2, "Good Matches & Object detection");
+	
+	//Test test;
+	//test.test(img, img2, "Good Matches & Object detection");
 
+	KeypointDescription keypointDescription;
+	keypointDescription.orb(img, img2);
+	keypointDescription.brisk(img, img2);
+	keypointDescription.sift(img, img2);
+	//keypointDescription.freak(img, img2);
 
-    waitKey(0);
+	/*vector<Point2f> vp1, vp2;
+	vp1.push_back(Point2f(1, 1));
+	vp1.push_back(Point2f(100, 1));
+	vp1.push_back(Point2f(50, 50));
+	vp1.push_back(Point2f(20, 10));
+
+	vp2.push_back(Point2f(11, 1));
+	vp2.push_back(Point2f(110, 1));
+	vp2.push_back(Point2f(60, 50));
+	vp2.push_back(Point2f(30, 10));
+
+	Mat H = findHomography(vp1, vp2, CV_RANSAC);
+	cout << "ransac..." << endl << H << endl;
+	vector<Point3f> v;
+	v.push_back({ vp1.at(0).x, vp1.at(0).y,1 });
+	v.push_back({ 2,2,1 });
+
+	transform(v, v, H);
+	cout << "correct: " << vp2.at(0) << " calculated: " << v.at(0) << endl;*/
+	
+	waitKey(0);
 	
    return 0;
 } 

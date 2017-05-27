@@ -30,6 +30,7 @@ public:
 	bool useMser(void);
 	bool useBrisk(void);
 	bool useFreak(void);
+	bool useOrb(void);
 
 private:
 

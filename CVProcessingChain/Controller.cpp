@@ -18,14 +18,16 @@ list<string> keypointFiles;
 
 bool original = true; //the original image
 bool histEqual = true; //histogram equalization, global contrast enhancement
-bool clahe = true; //clahe filter, lokal contrast enhancement
-bool nlm = true; //non local mean filter, blurring
+bool clahe = false; //clahe filter, lokal contrast enhancement
+bool nlm = false; //non local mean filter, blurring
 bool bilateral = false; //bilateral filter, blurring
+//verschiedene methoden zur grauwert umwandlung
 
 bool surf = true; //Speeded Up Robust Features
-bool mser = true; //Maximally Stable Extremal Regions
+bool mser = false; //Maximally Stable Extremal Regions
 bool brisk = false; //Binary Robust Invariant Scalable Keypoints
 bool freak = false; //Fast REtinA Keypoint
+bool orb = false; //Oriented FAST and Rotated BRIEF
 
 Controller::Controller()
 {
@@ -39,6 +41,7 @@ Controller::Controller()
 	if (mser) keypointDetectors.push_back("mser");
 	if (brisk) keypointDetectors.push_back("brisk");
 	if (freak) keypointDetectors.push_back("freak");
+	if (orb) keypointDetectors.push_back("orb");
 	
 	for (auto itP = preProcessors.cbegin(); itP != preProcessors.cend(); ++itP) {
 		for (auto itK = keypointDetectors.cbegin(); itK != keypointDetectors.cend(); ++itK) {
@@ -85,4 +88,7 @@ bool Controller::useBrisk() {
 }
 bool Controller::useFreak() {
 	return freak;
+}
+bool Controller::useOrb() {
+	return orb;
 }
