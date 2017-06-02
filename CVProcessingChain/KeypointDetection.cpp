@@ -7,6 +7,7 @@
 //============================================================================
 
 #include "KeypointDetection.h"
+#include "FileManager.h"
 #include "opencv2/core.hpp"
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
@@ -62,6 +63,9 @@ vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool s
 		//filename += "_surf.dat";
 		writeKeypoints(filename.c_str(), keypoints);
 	}
+	//write keypoints to json document
+	FileManager fileManager;
+	fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -103,6 +107,9 @@ vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool s
 		//filename += "_mser.dat";
 		writeKeypoints(filename.c_str(), keypoints);
 	}
+	//write keypoints to json document
+	FileManager fileManager;
+	fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -132,6 +139,9 @@ vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool 
 		//filename += "_brisk.dat";
 		writeKeypoints(filename.c_str(), keypoints);
 	}
+	//write keypoints to json document
+	FileManager fileManager;
+	fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -184,6 +194,9 @@ vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool sh
 		string filename = imageName;
 		writeKeypoints(filename.c_str(), keypoints);
 	}
+	//write keypoints to json document
+	FileManager fileManager;
+	fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 

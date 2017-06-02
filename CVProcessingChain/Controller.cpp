@@ -27,7 +27,7 @@ bool surf = true; //Speeded Up Robust Features
 bool mser = false; //Maximally Stable Extremal Regions
 bool brisk = false; //Binary Robust Invariant Scalable Keypoints
 bool freak = false; //Fast REtinA Keypoint
-bool orb = false; //Oriented FAST and Rotated BRIEF
+bool orb = true; //Oriented FAST and Rotated BRIEF
 
 Controller::Controller()
 {

@@ -12,9 +12,11 @@
 #include "PreProcessing.h"
 #include "KeypointDetection.h"
 #include "KeypointDescription.h"
+#include "FileManager.h"
 #include "Test.h"
 #include<list>
 #include<vector>
+#include<string>
 //#include<fstream>
 
 using namespace std;
@@ -23,13 +25,6 @@ using namespace std;
 // usage: path to image in argv[1]
 // main function. loads image, calls preprocessing routines, calls keypoint detectors, records processing times
 int main(int argc, char** argv) {
-
-	//Controller controller;
-	
-	//definition of used preprocessing methods
-	//const string imageName[] = { "original", "histEqual" };
-	//definition of used keypoint detectors
-	//const string kds[] = { "surf", "mser" };
 
    // check if enough arguments are defined
    if (argc < 3){
@@ -44,6 +39,9 @@ int main(int argc, char** argv) {
    Controller controller;
    PreProcessing preProcessing;
    KeypointDetection keypointDetection;
+   KeypointDescription keypointDescription;
+   FileManager fileManager;
+   fileManager.createEmptyJson("output.json");
    
     // load image, path in argv[1]
     cout << "load image1" << endl;
@@ -63,6 +61,22 @@ int main(int argc, char** argv) {
 		cin.get();
 		return -1;
 	}
+	// load homography, path in argv[3]
+	cout << "load homography" << endl;
+	Mat H = (Mat_<float>(3, 3) << 7.6285898e-01, -2.9922929e-01, 2.2567123e+02, 3.3443473e-01, 1.0143901e+00, -7.6999973e+01, 3.4663091e-04, -1.4364524e-05, 1.0000000e+00);
+	
+
+	//ifstream f;  // Datei-Handle
+	//string s;
+	//f.open(argv[3], ios::in); // Öffne Datei aus Parameter
+	//while (!f.eof())          // Solange noch Daten vorliegen
+	//{
+	//	getline(f, s);        // Lese eine Zeile
+	//	cout << s << endl;    // Zeige sie auf dem Bildschirm
+
+	//}
+	//f.close();
+
 	
     // convert U8 to 32F
     img.convertTo(img, CV_32FC1);
@@ -70,55 +84,74 @@ int main(int argc, char** argv) {
     cout << " > done" << endl;
 
 	// building a list for preprocessing images including original image1
-	vector<string> pVec = controller.getPreProcessors();
-	list<Mat> iList1;	
-	if (controller.useOriginal()) iList1.push_back(img);
-	if (controller.useHistEqual()) iList1.push_back(preProcessing.histogramEqualisation(img));
-	if (controller.useClahe()) iList1.push_back(preProcessing.clahe(img));
-	if (controller.useNlm()) iList1.push_back(preProcessing.nlmDenoising(img));
-	if (controller.useBilateral()) iList1.push_back(preProcessing.bilateralFiltering(img));
+	list<Mat> iList1;
+	vector<Mat> iVec1;
+	if (controller.useOriginal()) iVec1.push_back(img);
+	if (controller.useHistEqual()) iVec1.push_back(preProcessing.histogramEqualisation(img));
+	if (controller.useClahe()) iVec1.push_back(preProcessing.clahe(img));
+	if (controller.useNlm()) iVec1.push_back(preProcessing.nlmDenoising(img));
+	if (controller.useBilateral()) iVec1.push_back(preProcessing.bilateralFiltering(img));
 	// building a list for preprocessing images including original image2
 	list<Mat> iList2;
-	if (controller.useOriginal()) iList2.push_back(img2);
-	if (controller.useHistEqual()) iList2.push_back(preProcessing.histogramEqualisation(img2));
-	if (controller.useClahe()) iList2.push_back(preProcessing.clahe(img2));
-	if (controller.useNlm()) iList2.push_back(preProcessing.nlmDenoising(img2));
-	if (controller.useBilateral()) iList2.push_back(preProcessing.bilateralFiltering(img2));
+	vector<Mat> iVec2;
+	if (controller.useOriginal()) iVec2.push_back(img2);
+	if (controller.useHistEqual()) iVec2.push_back(preProcessing.histogramEqualisation(img2));
+	if (controller.useClahe()) iVec2.push_back(preProcessing.clahe(img2));
+	if (controller.useNlm()) iVec2.push_back(preProcessing.nlmDenoising(img2));
+	if (controller.useBilateral()) iVec2.push_back(preProcessing.bilateralFiltering(img2));
+	//for matching
+	list<Mat> mList1 = iList1;
+	list<Mat> mList2 = iList2;
+
 	
-	//test Ransac with surf
-	//Test test;
-	//cout << "iList1: " << iList1.size() << " iList2: " << iList2.size() << " sList: " << pVec.size() << endl;
-	//for (int i = 0; i < pVec.size(); ++i) {
-	//	test.test(iList1.front(), iList2.front(), pVec[i]);
-	//	iList1.pop_front();
-	//	iList2.pop_front();
-	//}
-	
-	
-	// building a vector for keypoints for each image in iList1
-	vector<string> kVec = controller.getKeypointDetectors();
-	vector<vector<KeyPoint>> keyVector1;
+	// vector of all preprocessing steps including original image
+	vector<string> pVec = controller.getPreProcessors();
+	// building a vector of keypoints for each image in iList1
+	//vector<string> kVec = controller.getKeypointDetectors();
+	vector<vector<KeyPoint>> kVecSurf1, kVecMser1, kVecBrisk1, kVecFreak1, kVecOrb1;
 	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "determine keypoints for " << pVec[i]<<"_1..." << endl;;
-		if (controller.useSurf()) keyVector1.push_back(keypointDetection.surf(iList1.front(), (pVec[i] + "_surf_1_.dat").c_str(), false, true));
-		if (controller.useMser()) keyVector1.push_back(keypointDetection.mser(iList1.front(), (pVec[i] + "_mser_1_.dat").c_str(), false, true));
-		if (controller.useBrisk()) keyVector1.push_back(keypointDetection.brisk(iList1.front(), (pVec[i] + "_brisk_1_.dat").c_str(), false, true));
-		if (controller.useFreak()) keyVector1.push_back(keypointDetection.freak(iList1.front(), (pVec[i] + "_freak_1_.dat").c_str(), false, true));
-		if (controller.useOrb()) keyVector1.push_back(keypointDetection.orb(iList1.front(), (pVec[i] + "_orb_1_.dat").c_str(), false, true));
-		iList1.pop_front();
+		cout << "determine keypoints for " << pVec[i]<<"_1 ..." << endl;
+		if (controller.useSurf()) kVecSurf1.push_back(keypointDetection.surf(iVec1[i], (pVec[i] + "_surf_1_.dat").c_str(), false, true));
+		if (controller.useMser()) kVecMser1.push_back(keypointDetection.mser(iVec1[i], (pVec[i] + "_mser_1_.dat").c_str(), false, true));
+		if (controller.useBrisk()) kVecBrisk1.push_back(keypointDetection.brisk(iVec1[i], (pVec[i] + "_brisk_1_.dat").c_str(), false, true));
+		if (controller.useFreak()) kVecFreak1.push_back(keypointDetection.freak(iVec1[i], (pVec[i] + "_freak_1_.dat").c_str(), false, true));
+		if (controller.useOrb()) kVecOrb1.push_back(keypointDetection.orb(iVec1[i], (pVec[i] + "_orb_1_.dat").c_str(), false, true));
 	}
-	// building a vector for keypoints for each image in iList2
-	vector<vector<KeyPoint>> keyVector2;
+	// building a vector of keypoints for each image in iList2
+	vector<vector<KeyPoint>> kVecSurf2, kVecMser2, kVecBrisk2, kVecFreak2, kVecOrb2;
 	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "determine keypoints for " << pVec[i] << "_2..." << endl;;
-		if (controller.useSurf()) keyVector2.push_back(keypointDetection.surf(iList2.front(), (pVec[i] + "_surf_2_.dat").c_str(), false, false));
-		if (controller.useMser()) keyVector2.push_back(keypointDetection.mser(iList2.front(), (pVec[i] + "_mser_2_.dat").c_str(), false, false));
-		if (controller.useBrisk()) keyVector2.push_back(keypointDetection.brisk(iList2.front(), (pVec[i] + "_brisk_2_.dat").c_str(), false, false));
-		if (controller.useFreak()) keyVector2.push_back(keypointDetection.freak(iList2.front(), (pVec[i] + "_freak_2_.dat").c_str(), false, false));
-		if (controller.useOrb()) keyVector1.push_back(keypointDetection.orb(iList2.front(), (pVec[i] + "_orb_2_.dat").c_str(), false, true));
-		iList2.pop_front();
+		cout << "determine keypoints for " << pVec[i] << "_2 ..." << endl;
+		if (controller.useSurf()) kVecSurf2.push_back(keypointDetection.surf(iVec2[i], (pVec[i] + "_surf_2_.dat").c_str(), false, false));
+		if (controller.useMser()) kVecMser2.push_back(keypointDetection.mser(iVec2[i], (pVec[i] + "_mser_2_.dat").c_str(), false, false));
+		if (controller.useBrisk()) kVecBrisk2.push_back(keypointDetection.brisk(iVec2[i], (pVec[i] + "_brisk_2_.dat").c_str(), false, false));
+		if (controller.useFreak()) kVecFreak2.push_back(keypointDetection.freak(iVec2[i], (pVec[i] + "_freak_2_.dat").c_str(), false, false));
+		if (controller.useOrb()) kVecOrb2.push_back(keypointDetection.orb(iVec2[i], (pVec[i] + "_orb_2_.dat").c_str(), false, true));
 	}
 
+
+	// building a vector of matches for each image-pair
+	vector<vector<DMatch>> matchVector;
+	vector<vector<DMatch>> matchVecSurf, matchVecOrb;
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "determine matches for " << pVec[i] << " ..." << endl;
+		if (controller.useSurf()) matchVecSurf.push_back(keypointDescription.surf(iVec1[i], kVecSurf1[i], iVec2[i], kVecSurf2[i]));
+		if (controller.useOrb()) matchVecOrb.push_back(keypointDescription.orb(iVec1[i], kVecOrb1[i], iVec2[i], kVecOrb2[i]));
+	}
+
+
+	// filter matches by ransac
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "filter matches by ransac for " << pVec[i] << " ..." << endl;
+		if (controller.useSurf()) keypointDescription.ransacFilter(kVecSurf1[i], kVecSurf2[i], matchVecSurf[i]);
+		if (controller.useOrb()) keypointDescription.ransacFilter(kVecOrb1[i], kVecOrb2[i], matchVecOrb[i]);
+	}
+
+	// write matches to json
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "write matches to json " << pVec[i] << " ..." << endl;
+		if (controller.useSurf()) fileManager.writeMatchesToJson(pVec[i]+"_surf_matches", matchVecSurf[i]);
+		if (controller.useOrb()) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", matchVecOrb[i]);
+	}
 
 	//number of preprocessing images including original image
 	//int kvSize = keypointVector.size();
@@ -188,33 +221,20 @@ int main(int argc, char** argv) {
 	//Test test;
 	//test.test(img, img2, "Good Matches & Object detection");
 
-	KeypointDescription keypointDescription;
-	keypointDescription.orb(img, img2);
-	keypointDescription.brisk(img, img2);
-	keypointDescription.sift(img, img2);
+	
+	//keypointDescription.orb(img, img2, H);
+	//keypointDescription.brisk(img, img2);
+	//keypointDescription.sift(img, img2);
 	//keypointDescription.freak(img, img2);
 
-	/*vector<Point2f> vp1, vp2;
-	vp1.push_back(Point2f(1, 1));
-	vp1.push_back(Point2f(100, 1));
-	vp1.push_back(Point2f(50, 50));
-	vp1.push_back(Point2f(20, 10));
 
-	vp2.push_back(Point2f(11, 1));
-	vp2.push_back(Point2f(110, 1));
-	vp2.push_back(Point2f(60, 50));
-	vp2.push_back(Point2f(30, 10));
 
-	Mat H = findHomography(vp1, vp2, CV_RANSAC);
-	cout << "ransac..." << endl << H << endl;
-	vector<Point3f> v;
-	v.push_back({ vp1.at(0).x, vp1.at(0).y,1 });
-	v.push_back({ 2,2,1 });
-
-	transform(v, v, H);
-	cout << "correct: " << vp2.at(0) << " calculated: " << v.at(0) << endl;*/
+	//vector<KeyPoint> keypoints;
+	//fileManager.writeKeypointsToJson("detektor2", keypoints);
 	
 	waitKey(0);
 	
    return 0;
 } 
+
+
