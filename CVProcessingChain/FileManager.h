@@ -26,7 +26,7 @@ public:
 
 
 	void writeKeypointsToJson(string path, vector<KeyPoint>& keypoints);
-	void writeMatchesToJson(string path, vector<DMatch>& matches);
+	void writeMatchesToJson(string path, string object, vector<DMatch>& matches);
 	void createEmptyJson(string path);
 
 

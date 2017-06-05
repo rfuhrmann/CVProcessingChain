@@ -23,10 +23,11 @@ bool nlm = false; //non local mean filter, blurring
 bool bilateral = false; //bilateral filter, blurring
 //verschiedene methoden zur grauwert umwandlung
 
+bool sift = true; //Scale-invariant feature transform
 bool surf = true; //Speeded Up Robust Features
 bool mser = false; //Maximally Stable Extremal Regions
-bool brisk = false; //Binary Robust Invariant Scalable Keypoints
-bool freak = false; //Fast REtinA Keypoint
+bool brisk = true; //Binary Robust Invariant Scalable Keypoints
+bool freak = true; //Fast REtinA Keypoint - Descriptor only, uses fast detector
 bool orb = true; //Oriented FAST and Rotated BRIEF
 
 Controller::Controller()
@@ -37,6 +38,7 @@ Controller::Controller()
 	if (nlm) preProcessors.push_back("nlm");
 	if (bilateral) preProcessors.push_back("bilateral");
 
+	if (sift) keypointDetectors.push_back("sift");
 	if (surf) keypointDetectors.push_back("surf");
 	if (mser) keypointDetectors.push_back("mser");
 	if (brisk) keypointDetectors.push_back("brisk");
@@ -77,6 +79,9 @@ vector<string> Controller::getKeypointDetectors() {
 	return keypointDetectors;
 }
 
+bool Controller::useSift() {
+	return sift;
+}
 bool Controller::useSurf() {
 	return surf;
 }

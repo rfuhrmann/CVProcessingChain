@@ -37,6 +37,39 @@ vector<Mat> KeypointDetection::run(Mat& img, const char* imageName, bool showIma
 }
 
 // surf keypoint detection
+// scale-invariant feature transform
+/*
+img         :  input image
+return      :  the result image
+*/
+vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+	Mat img2 = img.clone();
+	img2.convertTo(img2, CV_8UC1);
+	//-- Step 1: Detect the keypoints using SURF Detector
+	int minHessian = 400;
+	Ptr<SIFT> detector = SIFT::create(minHessian);
+	vector<KeyPoint> keypoints;
+	detector->detect(img2, keypoints);
+
+	//-- Draw keypoints
+	//printKeypoints(keypoints);
+	//cout << "#kp ..." << keypoints.size() <<endl;
+	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+	//-- Show detected (drawn) keypoints
+	if (showImage) imshow("Keypoints: " + String(imageName) + "_SIFT", img2);
+	//-- (over)Write keypoints to file (create file if non exists)
+	if (writeFile) {
+		string filename = imageName;
+		//filename += "_sift.dat";
+		writeKeypoints(filename.c_str(), keypoints);
+	}
+	//write keypoints to json document
+	//FileManager fileManager;
+	//fileManager.writeKeypointsToJson(imageName, keypoints);
+	return keypoints;
+}
+
+// surf keypoint detection
 // speeded up robust features
 /*
 img         :  input image
@@ -64,8 +97,40 @@ vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool s
 		writeKeypoints(filename.c_str(), keypoints);
 	}
 	//write keypoints to json document
-	FileManager fileManager;
-	fileManager.writeKeypointsToJson(imageName, keypoints);
+	//FileManager fileManager;
+	//fileManager.writeKeypointsToJson(imageName, keypoints);
+	return keypoints;
+}
+
+// fast keypoint detection
+// Features from accelerated segment test
+/*
+img         :  input image
+return      :  the result image
+*/
+vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+	Mat img2 = img.clone();
+	img2.convertTo(img2, CV_8UC1);
+	//-- Step 1: Detect the keypoints using SURF Detector
+	vector<KeyPoint> keypoints;
+	FAST(img2, keypoints, false);
+
+
+	//-- Draw keypoints
+	//printKeypoints(keypoints);
+	//cout << "#kp ..." << keypoints.size() <<endl;
+	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+	//-- Show detected (drawn) keypoints
+	if (showImage) imshow("Keypoints: " + String(imageName) + "_SURF", img2);
+	//-- (over)Write keypoints to file (create file if non exists)
+	if (writeFile) {
+		string filename = imageName;
+		//filename += "_surf.dat";
+		writeKeypoints(filename.c_str(), keypoints);
+	}
+	//write keypoints to json document
+	//FileManager fileManager;
+	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -108,8 +173,8 @@ vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool s
 		writeKeypoints(filename.c_str(), keypoints);
 	}
 	//write keypoints to json document
-	FileManager fileManager;
-	fileManager.writeKeypointsToJson(imageName, keypoints);
+	//FileManager fileManager;
+	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -140,35 +205,11 @@ vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool 
 		writeKeypoints(filename.c_str(), keypoints);
 	}
 	//write keypoints to json document
-	FileManager fileManager;
-	fileManager.writeKeypointsToJson(imageName, keypoints);
+	//FileManager fileManager;
+	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
-// freak keypoint detection
-// Fast REtinA Keypoint
-/*
-img         :  input image
-return      :  the result image
-*/
-vector<KeyPoint> KeypointDetection::freak(Mat& img, const char* imageName, bool showImage, bool writeFile) {
-	//Mat img2 = img.clone();
-	//img2.convertTo(img2, CV_8UC1);
-	////-- Step 1: Detect the keypoints using SURF Detector
-	//Ptr<FREAK> detector = FREAK::create();
-	vector<KeyPoint> keypoints;
-	//detector->detect(img2, keypoints);
-
-	//-- Show detected (drawn) keypoints
-	//if (showImage) imshow("Keypoints: " + String(imageName) + "_FREAK", img2);
-	////-- (over)Write keypoints to file (create file if non exists)
-	//if (writeFile) {
-	//	string filename = imageName;
-	//	filename += "_freak.dat";
-	//	writeKeypoints(filename.c_str(), keypoints);
-	//}
-	return keypoints;
-}
   
 // orb keypoint detection
 //Oriented FAST and Rotated BRIEF
@@ -195,8 +236,8 @@ vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool sh
 		writeKeypoints(filename.c_str(), keypoints);
 	}
 	//write keypoints to json document
-	FileManager fileManager;
-	fileManager.writeKeypointsToJson(imageName, keypoints);
+	//FileManager fileManager;
+	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 

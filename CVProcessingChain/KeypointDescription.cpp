@@ -62,7 +62,7 @@ vector<DMatch> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& i
 		good_matches.push_back(matches[i]);
 		//}
 	}
-	showMatches(img1, kp1, img2, kp2, good_matches, "###sift_matches");
+	//showMatches(img1, kp1, img2, kp2, good_matches, "###sift_matches");
 	return good_matches;
 }
 
@@ -100,6 +100,80 @@ vector<DMatch> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& i
 		}
 	}
 	//showMatches(img1, kp1, img2, kp2, good_matches, "###surf_matches");
+	return good_matches;
+}
+
+vector<DMatch> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+	img1.convertTo(img1, CV_8UC1);
+	img2.convertTo(img2, CV_8UC1);
+	Ptr<BRISK> detector = BRISK::create();
+	Mat descriptors1, descriptors2;
+
+	detector->compute(img1, kp1, descriptors1);
+	detector->compute(img2, kp2, descriptors2);
+
+	BFMatcher matcher;
+	vector< DMatch > matches;
+	matcher.match(descriptors1, descriptors2, matches);
+
+	double max_dist = 0; double min_dist = 100;
+
+	//-- Quick calculation of max and min distances between keypoints
+	for (int i = 0; i < descriptors1.rows; i++)
+	{
+		double dist = matches[i].distance;
+		if (dist < min_dist) min_dist = dist;
+		if (dist > max_dist) max_dist = dist;
+	}
+
+	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+	std::vector< DMatch > good_matches;
+
+	for (int i = 0; i < descriptors1.rows; i++)
+	{
+		//if (matches[i].distance < 3 * min_dist)
+		//{
+		good_matches.push_back(matches[i]);
+		//}
+	}
+	//showMatches(img1, kp1, img2, kp2, good_matches, "###orb_matches");
+	return good_matches;
+}
+
+vector<DMatch> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+	img1.convertTo(img1, CV_8UC1);
+	img2.convertTo(img2, CV_8UC1);
+	Ptr<FREAK> detector = FREAK::create();
+	Mat descriptors1, descriptors2;
+
+	detector->compute(img1, kp1, descriptors1);
+	detector->compute(img2, kp2, descriptors2);
+
+	BFMatcher matcher;
+	vector< DMatch > matches;
+	matcher.match(descriptors1, descriptors2, matches);
+
+	double max_dist = 0; double min_dist = 100;
+
+	//-- Quick calculation of max and min distances between keypoints
+	for (int i = 0; i < descriptors1.rows; i++)
+	{
+		double dist = matches[i].distance;
+		if (dist < min_dist) min_dist = dist;
+		if (dist > max_dist) max_dist = dist;
+	}
+
+	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
+	std::vector< DMatch > good_matches;
+
+	for (int i = 0; i < descriptors1.rows; i++)
+	{
+		//if (matches[i].distance < 3 * min_dist)
+		//{
+		good_matches.push_back(matches[i]);
+		//}
+	}
+	//showMatches(img1, kp1, img2, kp2, good_matches, "###orb_matches");
 	return good_matches;
 }
 
@@ -394,20 +468,21 @@ void KeypointDescription::freak(Mat& img1, Mat& img2) {
 }
 
 void KeypointDescription::ransacFilter(vector<KeyPoint>& keypointsObject, vector<KeyPoint>& keypointsScene, vector<DMatch>& matches) {
+
+	//ransac needs more than two entries
+	if (matches.size() < 3) return;
+
 	//-- Localize the object
 	vector<Point2f> obj;
 	vector<Point2f> scene;
 	vector<int> ransacMask;
-
 	for (int i = 0; i < matches.size(); i++)
 	{
 		//-- Get the keypoints from the good matches
 		obj.push_back(keypointsObject[matches[i].queryIdx].pt);
 		scene.push_back(keypointsScene[matches[i].trainIdx].pt);
 	}
-
 	Mat H = findHomography(obj, scene, CV_RANSAC, 3.0, ransacMask);
-
 	//filter outliers
 	for (int i = matches.size() - 1; i > 0; --i) {
 		if (ransacMask.at(i) == 0) matches.erase(matches.begin() + i);

@@ -26,6 +26,7 @@ public:
 	bool useNlm(void);
 	bool useBilateral(void);
 	vector<string> getKeypointDetectors(void);
+	bool useSift(void);
 	bool useSurf(void);
 	bool useMser(void);
 	bool useBrisk(void);

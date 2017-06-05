@@ -64,7 +64,7 @@ in                   :  name/path in json
 					 :  matches
 return               :
 */
-void FileManager::writeMatchesToJson(string path, vector<DMatch>& matches) {
+void FileManager::writeMatchesToJson(string path, string object, vector<DMatch>& matches) {
 
 	int kpSize = matches.size();
 	Document doc;
@@ -76,7 +76,7 @@ void FileManager::writeMatchesToJson(string path, vector<DMatch>& matches) {
 	Value mObject(kObjectType);
 	Value mName;
 	mName.SetString(path.c_str(), allocator);
-	doc["matches"].AddMember(mName, matches.size(), allocator);
+	doc[object.c_str()].AddMember(mName, matches.size(), allocator);
 
 	writeJsonFromDocument(::fileName, doc);
 }
@@ -107,6 +107,8 @@ void FileManager::createEmptyJson(string path) {
 
 	Value kpObj(kObjectType);
 	Value mObj(kObjectType);
+	Value realKpObj(kObjectType);
+	Value realMObj(kObjectType);
 	//Value kpName, mName;
 	//Value objArray(kArrayType);
 	//array.PushBack("hello", allocator).PushBack("world", allocator);
@@ -116,6 +118,8 @@ void FileManager::createEmptyJson(string path) {
 	//obj.AddMember(objName, 100, allocator);
 	doc.AddMember("keypoints", kpObj, allocator);
 	doc.AddMember("matches", mObj, allocator);
+	doc.AddMember("realKeypoints", realKpObj, allocator);
+	doc.AddMember("realMatches", realMObj, allocator);
 
 	writeJsonFromDocument(::fileName, doc);
 }
