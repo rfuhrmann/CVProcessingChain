@@ -30,14 +30,19 @@ bool brisk = true; //Binary Robust Invariant Scalable Keypoints
 bool freak = true; //Fast REtinA Keypoint - Descriptor only, uses fast detector
 bool orb = true; //Oriented FAST and Rotated BRIEF
 
+//threshold for max distance of a match (distance of keypoints)
+int thresh = 1000;
+
 Controller::Controller()
 {
+	preProcessors.clear();
 	if (original) preProcessors.push_back("original");
 	if (histEqual) preProcessors.push_back("histEqual");
 	if (clahe) preProcessors.push_back("clahe");
 	if (nlm) preProcessors.push_back("nlm");
 	if (bilateral) preProcessors.push_back("bilateral");
 
+	keypointDetectors.clear();
 	if (sift) keypointDetectors.push_back("sift");
 	if (surf) keypointDetectors.push_back("surf");
 	if (mser) keypointDetectors.push_back("mser");
@@ -45,6 +50,7 @@ Controller::Controller()
 	if (freak) keypointDetectors.push_back("freak");
 	if (orb) keypointDetectors.push_back("orb");
 	
+	keypointFiles.clear();
 	for (auto itP = preProcessors.cbegin(); itP != preProcessors.cend(); ++itP) {
 		for (auto itK = keypointDetectors.cbegin(); itK != keypointDetectors.cend(); ++itK) {
 			keypointFiles.push_back(*itP+"_"+*itK+".dat");
@@ -96,4 +102,8 @@ bool Controller::useFreak() {
 }
 bool Controller::useOrb() {
 	return orb;
+}
+
+int Controller::getThreshold() {
+	return thresh;
 }

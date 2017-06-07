@@ -8,6 +8,7 @@
 
 #include "KeypointDescription.h"
 #include "FileManager.h"
+#include "KeypointMatcher.h"
 #include "opencv2/core.hpp"
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
@@ -29,7 +30,7 @@ Mat KeypointDescription::surf(Mat& img, vector<KeyPoint> kp) {
 	return img;
 }
 
-vector<DMatch> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+vector<Mat> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
 	img1.convertTo(img1, CV_8UC1);
 	img2.convertTo(img2, CV_8UC1);
 	Ptr<SIFT> detector = SIFT::create();
@@ -38,14 +39,78 @@ vector<DMatch> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& i
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
 
-	BFMatcher matcher;
+	return { descriptors1, descriptors2 };
+}
+
+vector<Mat> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+	img1.convertTo(img1, CV_8UC1);
+	img2.convertTo(img2, CV_8UC1);
+	Ptr<SURF> detector = SURF::create();
+	Mat descriptors1, descriptors2;
+
+	detector->compute(img1, kp1, descriptors1);
+	detector->compute(img2, kp2, descriptors2);
+
+	return{ descriptors1, descriptors2 };
+}
+
+vector<Mat> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+	img1.convertTo(img1, CV_8UC1);
+	img2.convertTo(img2, CV_8UC1);
+	Ptr<BRISK> detector = BRISK::create();
+	Mat descriptors1, descriptors2;
+
+	detector->compute(img1, kp1, descriptors1);
+	detector->compute(img2, kp2, descriptors2);
+
+	return{ descriptors1, descriptors2 };
+}
+
+vector<Mat> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+	img1.convertTo(img1, CV_8UC1);
+	img2.convertTo(img2, CV_8UC1);
+	Ptr<FREAK> detector = FREAK::create();
+	Mat descriptors1, descriptors2;
+
+	detector->compute(img1, kp1, descriptors1);
+	detector->compute(img2, kp2, descriptors2);
+
+	return{ descriptors1, descriptors2 };
+}
+
+vector<Mat> KeypointDescription::orb(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+	img1.convertTo(img1, CV_8UC1);
+	img2.convertTo(img2, CV_8UC1);
+	Ptr<ORB> detector = ORB::create();
+	Mat descriptors1, descriptors2;
+
+	detector->compute(img1, kp1, descriptors1);
+	detector->compute(img2, kp2, descriptors2);
+
+	return{ descriptors1, descriptors2 };
+}
+
+vector<DMatch> KeypointDescription::sift1(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+	img1.convertTo(img1, CV_8UC1);
+	img2.convertTo(img2, CV_8UC1);
+	Ptr<SIFT> detector = SIFT::create();
+	Mat descriptors1, descriptors2;
+
+	detector->compute(img1, kp1, descriptors1);
+	detector->compute(img2, kp2, descriptors2);
+	
+	//BFMatcher matcher(NORM_L2, false);
 	vector< DMatch > matches;
-	matcher.match(descriptors1, descriptors2, matches);
+
+	KeypointMatcher kpMatcher;
+	//matches = kpMatcher.ratioMatcher(matcher, descriptors1, descriptors2);
+	matches = kpMatcher.ratioMatcher(NORM_L2, descriptors1, descriptors2);
+	//matcher.match(descriptors1, descriptors2, matches);
 
 	double max_dist = 0; double min_dist = 100;
 
 	//-- Quick calculation of max and min distances between keypoints
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		double dist = matches[i].distance;
 		if (dist < min_dist) min_dist = dist;
@@ -55,7 +120,7 @@ vector<DMatch> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& i
 	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 	std::vector< DMatch > good_matches;
 
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		//if (matches[i].distance < 3 * min_dist)
 		//{
@@ -66,7 +131,7 @@ vector<DMatch> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& i
 	return good_matches;
 }
 
-vector<DMatch> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+vector<DMatch> KeypointDescription::surf1(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
 	img1.convertTo(img1, CV_8UC1);
 	img2.convertTo(img2, CV_8UC1);
 	Ptr<SURF> detector = SURF::create();
@@ -75,14 +140,17 @@ vector<DMatch> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& i
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
 
-	BFMatcher matcher;
+	//BFMatcher matcher(NORM_L2, false);
 	vector< DMatch > matches;
-	matcher.match(descriptors1, descriptors2, matches);
+
+	KeypointMatcher kpMatcher;
+	matches = kpMatcher.ratioMatcher(NORM_L2, descriptors1, descriptors2);
+	//matcher.match(descriptors1, descriptors2, matches);
 
 	double max_dist = 0; double min_dist = 100;
 
 	//-- Quick calculation of max and min distances between keypoints
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++) //descriptor1.rows
 	{
 		double dist = matches[i].distance;
 		if (dist < min_dist) min_dist = dist;
@@ -92,7 +160,7 @@ vector<DMatch> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& i
 	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 	std::vector< DMatch > good_matches;
 
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		if (matches[i].distance < 300 * min_dist) //3*min
 		{
@@ -103,7 +171,7 @@ vector<DMatch> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& i
 	return good_matches;
 }
 
-vector<DMatch> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+vector<DMatch> KeypointDescription::brisk1(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
 	img1.convertTo(img1, CV_8UC1);
 	img2.convertTo(img2, CV_8UC1);
 	Ptr<BRISK> detector = BRISK::create();
@@ -112,14 +180,17 @@ vector<DMatch> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& 
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
 
-	BFMatcher matcher;
+	//BFMatcher matcher(NORM_HAMMING, false);
 	vector< DMatch > matches;
-	matcher.match(descriptors1, descriptors2, matches);
+
+	KeypointMatcher kpMatcher;
+	matches = kpMatcher.ratioMatcher(NORM_HAMMING, descriptors1, descriptors2);
+	//matcher.match(descriptors1, descriptors2, matches);
 
 	double max_dist = 0; double min_dist = 100;
 
 	//-- Quick calculation of max and min distances between keypoints
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		double dist = matches[i].distance;
 		if (dist < min_dist) min_dist = dist;
@@ -129,7 +200,7 @@ vector<DMatch> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& 
 	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 	std::vector< DMatch > good_matches;
 
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		//if (matches[i].distance < 3 * min_dist)
 		//{
@@ -140,7 +211,7 @@ vector<DMatch> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& 
 	return good_matches;
 }
 
-vector<DMatch> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+vector<DMatch> KeypointDescription::freak1(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
 	img1.convertTo(img1, CV_8UC1);
 	img2.convertTo(img2, CV_8UC1);
 	Ptr<FREAK> detector = FREAK::create();
@@ -149,14 +220,17 @@ vector<DMatch> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& 
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
 
-	BFMatcher matcher;
+	//BFMatcher matcher(NORM_HAMMING, false);
 	vector< DMatch > matches;
-	matcher.match(descriptors1, descriptors2, matches);
+
+	KeypointMatcher kpMatcher;
+	matches = kpMatcher.ratioMatcher(NORM_HAMMING, descriptors1, descriptors2);
+	//matcher.match(descriptors1, descriptors2, matches);
 
 	double max_dist = 0; double min_dist = 100;
 
 	//-- Quick calculation of max and min distances between keypoints
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		double dist = matches[i].distance;
 		if (dist < min_dist) min_dist = dist;
@@ -166,7 +240,7 @@ vector<DMatch> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& 
 	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 	std::vector< DMatch > good_matches;
 
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		//if (matches[i].distance < 3 * min_dist)
 		//{
@@ -177,7 +251,7 @@ vector<DMatch> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& 
 	return good_matches;
 }
 
-vector<DMatch> KeypointDescription::orb(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+vector<DMatch> KeypointDescription::orb1(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
 	img1.convertTo(img1, CV_8UC1);
 	img2.convertTo(img2, CV_8UC1);
 	Ptr<ORB> detector = ORB::create();
@@ -186,14 +260,17 @@ vector<DMatch> KeypointDescription::orb(Mat& img1, vector<KeyPoint> kp1, Mat& im
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
 
-	BFMatcher matcher;
+	//BFMatcher matcher(NORM_HAMMING, false);
 	vector< DMatch > matches;
-	matcher.match(descriptors1, descriptors2, matches);
+
+	KeypointMatcher kpMatcher;
+	matches = kpMatcher.ratioMatcher(NORM_HAMMING, descriptors1, descriptors2);
+	//matcher.match(descriptors1, descriptors2, matches);
 
 	double max_dist = 0; double min_dist = 100;
 
 	//-- Quick calculation of max and min distances between keypoints
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		double dist = matches[i].distance;
 		if (dist < min_dist) min_dist = dist;
@@ -203,7 +280,7 @@ vector<DMatch> KeypointDescription::orb(Mat& img1, vector<KeyPoint> kp1, Mat& im
 	//-- Draw only "good" matches (i.e. whose distance is less than 3*min_dist )
 	std::vector< DMatch > good_matches;
 
-	for (int i = 0; i < descriptors1.rows; i++)
+	for (int i = 0; i < matches.size(); i++)
 	{
 		//if (matches[i].distance < 3 * min_dist)
 		//{

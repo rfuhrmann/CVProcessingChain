@@ -51,12 +51,12 @@ vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool s
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 
-	//-- Draw keypoints
-	//printKeypoints(keypoints);
-	//cout << "#kp ..." << keypoints.size() <<endl;
-	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 	//-- Show detected (drawn) keypoints
-	if (showImage) imshow("Keypoints: " + String(imageName) + "_SIFT", img2);
+	if (showImage) {
+		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+		imshow("Keypoints: " + String(imageName) + "_SIFT", img2);
+	}
+
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
@@ -84,12 +84,12 @@ vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool s
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 
-	//-- Draw keypoints
-	//printKeypoints(keypoints);
-	//cout << "#kp ..." << keypoints.size() <<endl;
-	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+	
 	//-- Show detected (drawn) keypoints
-	if (showImage) imshow("Keypoints: "+String(imageName)+"_SURF", img2);
+	if (showImage) {
+		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+		imshow("Keypoints: " + String(imageName) + "_SURF", img2);
+	}
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
@@ -113,15 +113,13 @@ vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool s
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
 	vector<KeyPoint> keypoints;
-	FAST(img2, keypoints, false);
+	FAST(img2, keypoints, 40, false);
 
-
-	//-- Draw keypoints
-	//printKeypoints(keypoints);
-	//cout << "#kp ..." << keypoints.size() <<endl;
-	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 	//-- Show detected (drawn) keypoints
-	if (showImage) imshow("Keypoints: " + String(imageName) + "_SURF", img2);
+	if (showImage) {
+		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+		imshow("Keypoints: " + String(imageName) + "_SURF", img2);
+	}
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
@@ -161,11 +159,12 @@ vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool s
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 
-	//-- Draw keypoints
-	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 
 	//-- Show detected (drawn) keypoints
-	if (showImage) imshow("Keypoints: " + String(imageName) + "_MSER", img2);
+	if (showImage) {
+		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+		imshow("Keypoints: " + String(imageName) + "_MSER", img2);
+	}
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
@@ -193,11 +192,11 @@ vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool 
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 
-	//-- Draw keypoints
-	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
-
 	//-- Show detected (drawn) keypoints
-	if (showImage) imshow("Keypoints: " + String(imageName) + "_BRISK", img2);
+	if (showImage) {
+		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+		imshow("Keypoints: " + String(imageName) + "_BRISK", img2);
+	}
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
@@ -225,11 +224,12 @@ vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool sh
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 
-	//-- Draw keypoints
-	drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 
 	//-- Show detected (drawn) keypoints
-	if (showImage) imshow("Keypoints: " + String(imageName) + "_ORB", img2);
+	if (showImage) {
+		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
+		imshow("Keypoints: " + String(imageName) + "_ORB", img2);
+	}
 	//-- (over)Write keypoints to file (create file if non exists)
 	if (writeFile) {
 		string filename = imageName;
