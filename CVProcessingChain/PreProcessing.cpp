@@ -9,24 +9,24 @@
 #include "PreProcessing.h"
 
 
+//The conventional ranges for R, G, and B channel values are :
+//	0 to 255 for CV_8U images
+//	0 to 65535 for CV_16U images
+//	0 to 1 for CV_32F images
 
-// function calls preprocessing functions
-/*
-in                   :  input image
-return               :  list of input image and all preprocessed images
-*/
-list<Mat> PreProcessing::run(Mat& img){
-	list<Mat> images;
-	// Mat::zeros(img.size(), img.type());
-	images.push_back(img);
-	images.push_back(histogramEqualisation(img));
-	//images.push_back(clahe(img));
-	//images.push_back(nlmDenoising(img));
-	//images.push_back(bilateralFiltering(img));
-	return images;
 
+
+
+Mat PreProcessing::rgb(Mat& img) {
+	Mat img2;
+	img.convertTo(img2, CV_8UC1);
+	return img2;
 }
-
+Mat PreProcessing::yCrCb(Mat& img) {
+	Mat img2;
+	cvtColor(img, img2, COLOR_BGR2YCrCb);
+	return img2;
+}
 // histogram equalization for global contrat enhancement
 /*
 img         :  input image
@@ -35,7 +35,7 @@ return      :  the result image
 Mat PreProcessing::histogramEqualisation(Mat& img) {
 	//Mat img2 = Mat::zeros(img.size(), img.type());
 	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
+	//img2.convertTo(img2, CV_8UC1);
 	equalizeHist(img2, img2);
 	return img2;
 }

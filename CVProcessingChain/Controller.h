@@ -20,7 +20,9 @@ public:
 	~Controller();
 
 	vector<string> getPreProcessors(void);
-	bool useOriginal(void);
+	bool useOriginal(void); 
+	bool useRGB(void);
+	bool useYCrCb(void);
 	bool useHistEqual(void);
 	bool useClahe(void);
 	bool useNlm(void);

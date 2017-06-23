@@ -38,7 +38,8 @@ vector<Mat> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& img2
 
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
-
+	cout << "sift-vSize " << descriptors1.size() << endl;
+	cout << "sift-vSize " << descriptors1 << endl;
 	return { descriptors1, descriptors2 };
 }
 
@@ -50,7 +51,7 @@ vector<Mat> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& img2
 
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
-
+	cout << "surf-vSize " << descriptors1.size() << endl;
 	return{ descriptors1, descriptors2 };
 }
 
@@ -62,7 +63,7 @@ vector<Mat> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& img
 
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
-
+	cout << "brisk-vSize " << descriptors1.size() << endl;
 	return{ descriptors1, descriptors2 };
 }
 
@@ -74,7 +75,7 @@ vector<Mat> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& img
 
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
-
+	cout << "freak-vSize " << descriptors1.size() << endl;
 	return{ descriptors1, descriptors2 };
 }
 
@@ -86,7 +87,7 @@ vector<Mat> KeypointDescription::orb(Mat& img1, vector<KeyPoint> kp1, Mat& img2,
 
 	detector->compute(img1, kp1, descriptors1);
 	detector->compute(img2, kp2, descriptors2);
-
+	cout << "orb-vSize " << descriptors1.size() << endl;
 	return{ descriptors1, descriptors2 };
 }
 

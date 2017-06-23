@@ -26,7 +26,9 @@ class PreProcessing{
 
       // testing routine
       void test(void);
-	  list<Mat> run(Mat&);
+	  //change colorspace
+	  Mat rgb(Mat&);
+	  Mat yCrCb(Mat&);
 	  //contrast enhancement
 	  Mat histogramEqualisation(Mat&);
 	  Mat clahe(Mat&);
@@ -34,6 +36,10 @@ class PreProcessing{
 	  Mat nlmDenoising(Mat&);
 	  //blur
 	  Mat bilateralFiltering(Mat&);
+
+	  //convert image to 
+	  
+
       // function headers of given functions
       Mat degradeImage(Mat& img, Mat& degradedImg, double filterDev, double snr);
       void showImage(const char* win, Mat img, bool cut=true);

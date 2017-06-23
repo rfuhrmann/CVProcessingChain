@@ -16,19 +16,22 @@ vector<string> preProcessors;
 vector<string> keypointDetectors;
 list<string> keypointFiles;
 
-bool original = true; //the original image
+bool original = false; //the original image
+bool rgb = true; //rgb color space for greyscale conversion
+bool yCrCb = false; //rgb color space for greyscale conversion
 bool histEqual = true; //histogram equalization, global contrast enhancement
-bool clahe = false; //clahe filter, lokal contrast enhancement
-bool nlm = false; //non local mean filter, blurring
+bool clahe = false; //clahe filter, Contrast Limited Adaptive Histogram Equalization
 bool bilateral = false; //bilateral filter, blurring
+bool nlm = false; //non local mean filter, blurring
+
 //verschiedene methoden zur grauwert umwandlung
 
-bool sift = true; //Scale-invariant feature transform
+bool sift = false; //Scale-invariant feature transform
 bool surf = true; //Speeded Up Robust Features
 bool mser = false; //Maximally Stable Extremal Regions
-bool brisk = true; //Binary Robust Invariant Scalable Keypoints
-bool freak = true; //Fast REtinA Keypoint - Descriptor only, uses fast detector
-bool orb = true; //Oriented FAST and Rotated BRIEF
+bool brisk = false; //Binary Robust Invariant Scalable Keypoints
+bool freak = false; //Fast REtinA Keypoint - Descriptor only, uses fast detector
+bool orb = false; //Oriented FAST and Rotated BRIEF
 
 //threshold for max distance of a match (distance of keypoints)
 int thresh = 1000;
@@ -37,6 +40,8 @@ Controller::Controller()
 {
 	preProcessors.clear();
 	if (original) preProcessors.push_back("original");
+	if (rgb) preProcessors.push_back("rgb");
+	if (yCrCb) preProcessors.push_back("yCrCb");
 	if (histEqual) preProcessors.push_back("histEqual");
 	if (clahe) preProcessors.push_back("clahe");
 	if (nlm) preProcessors.push_back("nlm");
@@ -67,6 +72,12 @@ vector<string> Controller::getPreProcessors() {
 
 bool Controller::useOriginal() {
 	return original;
+}
+bool Controller::useRGB() {
+	return rgb;
+}
+bool Controller::useYCrCb() {
+	return yCrCb;
 }
 bool Controller::useHistEqual() {
 	return histEqual;
