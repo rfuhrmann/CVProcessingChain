@@ -21,13 +21,13 @@ public:
 	// destructor
 	~KeypointDetection(void){};
 	void test(void);
-	vector<Mat> run(Mat&, const char* imageName, bool showImage, bool writeFile);
-	vector<KeyPoint> sift(Mat& img, const char* imageName, bool showImage, bool writeFile);
-	vector<KeyPoint> surf(Mat& img, const char* imageName, bool showImage, bool writeFile);
-	vector<KeyPoint> mser(Mat& img, const char* imageName, bool showImage, bool writeFile);
-	vector<KeyPoint> brisk(Mat& img, const char* imageName, bool showImage, bool writeFile);
-	vector<KeyPoint> fast(Mat& img, const char* imageName, bool showImage, bool writeFile);
-	vector<KeyPoint> orb(Mat& img, const char* imageName, bool showImage, bool writeFile);
+	//vector<Mat> run(Mat&, const char* imageName, bool showImage, bool writeFile);
+	vector<KeyPoint> sift(Mat& img, const char* imageName, bool showImage);
+	vector<KeyPoint> surf(Mat& img, const char* imageName, bool showImage);
+	vector<KeyPoint> mser(Mat& img, const char* imageName, bool showImage);
+	vector<KeyPoint> brisk(Mat& img, const char* imageName, bool showImag);
+	vector<KeyPoint> fast(Mat& img, const char* imageName, bool showImage);
+	vector<KeyPoint> orb(Mat& img, const char* imageName, bool showImage);
 	void printKeypoints(vector<KeyPoint> kp);
 	void writeKeypoints(const char* filename, vector<KeyPoint> kp);// , String filename);
 	void showKeypoints(const char* win, Mat& img, bool cut = true);

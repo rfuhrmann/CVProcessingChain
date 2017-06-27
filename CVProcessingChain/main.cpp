@@ -10,6 +10,8 @@
 
 #include "Controller.h"
 #include "PreProcessing.h"
+#include "DetectionHelper.h"
+#include "DescriptionHelper.h"
 #include "KeypointDetection.h"
 #include "KeypointDescription.h"
 #include "FileManager.h"
@@ -18,6 +20,7 @@
 #include <list>
 #include <vector>
 #include <string>
+#include <time.h>
 //#include<fstream>
 
 using namespace std;
@@ -158,80 +161,117 @@ int main(int argc, char** argv) {
 	// vector of all preprocessing steps including original image
 	vector<string> pVec = controller.getPreProcessors();
 
+
+	//time = clock();
+	//// perform unsharp masking
+	//Mat tmp = dip3.run(value, type, size, thresh, scale);
+	//// measure stopping time
+	//time = (clock() - time);
+	//// print the ellapsed time
+	//switch (type) {
+	//case 0:
+	//	cout << ((double)time) / CLOCKS_PER_SEC << "sec\n" << endl;
+	//	fileSpatial << ((double)time) / CLOCKS_PER_SEC << endl;
+
+	clock_t time;
+	vector<clock_t> detectionTimes;
+
 	// #################### detection ####################
 	// building a vector of keypoints for each image in iList
 	vector<vector<KeyPoint>> kVecSift1, kVecSurf1, kVecMser1, kVecBrisk1, kVecFreak1, kVecOrb1;
 	vector<vector<KeyPoint>> kVecSift2, kVecSurf2, kVecMser2, kVecBrisk2, kVecFreak2, kVecOrb2;
-	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "determine keypoints for " << pVec[i]<<" ..." << endl;
-		if (controller.useSift() == true) {
-			kVecSift1.push_back(keypointDetection.sift(iVec1[i], (pVec[i] + "_sift_1.dat").c_str(), false, true));
-			kVecSift2.push_back(keypointDetection.sift(iVec2[i], (pVec[i] + "_sift_2.dat").c_str(), false, false));
-		}
-		if (controller.useSurf() == true) {
-			kVecSurf1.push_back(keypointDetection.surf(iVec1[i], (pVec[i] + "_surf_1.dat").c_str(), false, true));
-			kVecSurf2.push_back(keypointDetection.surf(iVec2[i], (pVec[i] + "_surf_2.dat").c_str(), false, false));
-		}
-		if (controller.useMser() == true) {
-			kVecMser1.push_back(keypointDetection.mser(iVec1[i], (pVec[i] + "_mser_1.dat").c_str(), false, true));
-			kVecMser2.push_back(keypointDetection.mser(iVec2[i], (pVec[i] + "_mser_2.dat").c_str(), false, false));
-		}
-		if (controller.useBrisk() == true) {
-			kVecBrisk1.push_back(keypointDetection.brisk(iVec1[i], (pVec[i] + "_brisk_1.dat").c_str(), false, true));
-			kVecBrisk2.push_back(keypointDetection.brisk(iVec2[i], (pVec[i] + "_brisk_2.dat").c_str(), false, false));
-		}
-		if (controller.useFreak() == true) {
-			kVecFreak1.push_back(keypointDetection.fast(iVec1[i], (pVec[i] + "_freak_1.dat").c_str(), false, true));
-			kVecFreak2.push_back(keypointDetection.fast(iVec2[i], (pVec[i] + "_freak_2.dat").c_str(), false, false));
-		}
-		if (controller.useOrb() == true) {
-			kVecOrb1.push_back(keypointDetection.orb(iVec1[i], (pVec[i] + "_orb_1.dat").c_str(), false, true));
-			kVecOrb2.push_back(keypointDetection.orb(iVec2[i], (pVec[i] + "_orb_2.dat").c_str(), false, false));
-		}
-	}
-	cout << " > done" << endl;
+	vector<vector<vector<KeyPoint>>> helperKeypoints{kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2};
+	DetectionHelper detectionHelper;
+	detectionHelper.runDetection(pVec, iVec1, iVec2, kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecMser1, kVecMser2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2);
 
-
-	// write keypoints to json
-	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "write keypoints to json " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) {
-			fileManager.writeKeypointsToJson(pVec[i] + "_sift_keypoints_1", kVecSift1[i]);
-			fileManager.writeKeypointsToJson(pVec[i] + "_sift_keypoints_2", kVecSift2[i]);
-		}
-		if (controller.useSurf() == true) {
-			fileManager.writeKeypointsToJson(pVec[i] + "_surf_keypoints_1", kVecSurf1[i]);
-			fileManager.writeKeypointsToJson(pVec[i] + "_surf_keypoints_2", kVecSurf2[i]);
-		}
-		if (controller.useMser() == true) {
-			fileManager.writeKeypointsToJson(pVec[i] + "_mser_keypoints_1", kVecMser1[i]);
-			fileManager.writeKeypointsToJson(pVec[i] + "_mser_keypoints_2", kVecMser2[i]);
-		}
-		if (controller.useBrisk() == true) {
-			fileManager.writeKeypointsToJson(pVec[i] + "_brisk_keypoints_1", kVecBrisk1[i]);
-			fileManager.writeKeypointsToJson(pVec[i] + "_brisk_keypoints_2", kVecBrisk2[i]);
-		}
-		if (controller.useFreak() == true) {
-			fileManager.writeKeypointsToJson(pVec[i] + "_freak_keypoints_1", kVecFreak1[i]);
-			fileManager.writeKeypointsToJson(pVec[i] + "_freak_keypoints_2", kVecFreak2[i]);
-		}
-		if (controller.useOrb() == true) {
-			fileManager.writeKeypointsToJson(pVec[i] + "_orb_keypoints_1", kVecOrb1[i]);
-			fileManager.writeKeypointsToJson(pVec[i] + "_orb_keypoints_2", kVecOrb2[i]);
-		}	
-	}
-	cout << " > done" << endl;
 
 	// #################### description ####################
 	// building a vector of descriptors for each image in iList1
-	vector<vector<Mat>> descVecSift, descVecSurf, descVecBrisk, descVecFreak, descVecOrb;
+	//vector<vector<Mat>> descVecSift, descVecSurf, descVecBrisk, descVecFreak, descVecOrb;
+	//for (int i = 0; i < pVec.size(); ++i) {
+	//	cout << "determine descriptors for " << pVec[i] << " ..." << endl;
+	//	if (controller.useSift() == true) descVecSift.push_back(keypointDescription.sift(iVec1[i], kVecSift1[i], iVec2[i], kVecSift2[i]));
+	//	if (controller.useSurf() == true) descVecSurf.push_back(keypointDescription.surf(iVec1[i], kVecSurf1[i], iVec2[i], kVecSurf2[i]));
+	//	if (controller.useBrisk() == true) descVecBrisk.push_back(keypointDescription.brisk(iVec1[i], kVecBrisk1[i], iVec2[i], kVecBrisk2[i]));
+	//	if (controller.useFreak() == true) descVecFreak.push_back(keypointDescription.freak(iVec1[i], kVecFreak1[i], iVec2[i], kVecFreak2[i]));
+	//	if (controller.useOrb() == true) descVecOrb.push_back(keypointDescription.orb(iVec1[i], kVecOrb1[i], iVec2[i], kVecOrb2[i]));
+	//}
+	//cout << " > done" << endl;
+	vector<Mat> dVecSift1, dVecSurf1, dVecBrisk1, dVecFreak1, dVecOrb1;
+	vector<Mat> dVecSift2, dVecSurf2, dVecBrisk2, dVecFreak2, dVecOrb2;
+	//vector<vector<Mat>> helperDescriptors{ dVecSift1, dVecSift2, dVecSurf1, dVecSurf2, dVecBrisk1, dVecBrisk2, dVecFreak1, dVecFreak2, dVecOrb1, dVecOrb2 };
+	//DescriptionHelper descriptionHelper;
+	//descriptionHelper.runDescription(pVec, iVec1, iVec2, helperKeypoints, helperDescriptors);
+	clock_t tDSift1, tDSift2, tDSurf1, tDSurf2, tDBrisk1, tDBrisk2, tDFreak1, tDFreak2, tDOrb1, tDOrb2;
+
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "determine descriptors for " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) descVecSift.push_back(keypointDescription.sift(iVec1[i], kVecSift1[i], iVec2[i], kVecSift2[i]));
-		if (controller.useSurf() == true) descVecSurf.push_back(keypointDescription.surf(iVec1[i], kVecSurf1[i], iVec2[i], kVecSurf2[i]));
-		if (controller.useBrisk() == true) descVecBrisk.push_back(keypointDescription.brisk(iVec1[i], kVecBrisk1[i], iVec2[i], kVecBrisk2[i]));
-		if (controller.useFreak() == true) descVecFreak.push_back(keypointDescription.freak(iVec1[i], kVecFreak1[i], iVec2[i], kVecFreak2[i]));
-		if (controller.useOrb() == true) descVecOrb.push_back(keypointDescription.orb(iVec1[i], kVecOrb1[i], iVec2[i], kVecOrb2[i]));
+		if (controller.useSift() == true) {
+			tDSift1 = clock();
+			dVecSift1.push_back(keypointDescription.sift(iVec1[i], kVecSift1[i]));
+			tDSift1 = (clock() - tDSift1);
+			tDSift2 = clock();
+			dVecSift2.push_back(keypointDescription.sift(iVec2[i], kVecSift2[i]));
+			tDSift2 = (clock() - tDSift2);
+		}
+		if (controller.useSurf() == true) {
+			tDSurf1 = clock();
+			dVecSurf1.push_back(keypointDescription.surf(iVec1[i], kVecSurf1[i]));
+			tDSurf1 = (clock() - tDSurf1);
+			tDSurf2 = clock();
+			dVecSurf2.push_back(keypointDescription.surf(iVec2[i], kVecSurf2[i]));
+			tDSurf2 = (clock() - tDSurf2);
+		}
+		if (controller.useBrisk() == true) {
+			tDBrisk1 = clock();
+			dVecBrisk1.push_back(keypointDescription.brisk(iVec1[i], kVecBrisk1[i]));
+			tDBrisk1 = (clock() - tDBrisk1);
+			tDBrisk2 = clock();
+			dVecBrisk2.push_back(keypointDescription.brisk(iVec2[i], kVecBrisk2[i]));
+			tDBrisk2 = (clock() - tDBrisk2);
+		}
+		if (controller.useFreak() == true) {
+			tDFreak1 = clock();
+			dVecFreak1.push_back(keypointDescription.freak(iVec1[i], kVecFreak1[i]));
+			tDFreak1 = (clock() - tDFreak1);
+			tDFreak2 = clock();
+			dVecFreak2.push_back(keypointDescription.freak(iVec2[i], kVecFreak2[i]));
+			tDFreak2 = (clock() - tDFreak2);
+		}
+		if (controller.useOrb() == true) {
+			tDOrb1 = clock();
+			dVecOrb1.push_back(keypointDescription.orb(iVec1[i], kVecOrb1[i]));
+			tDOrb1 = (clock() - tDOrb1);
+			tDOrb2 = clock();
+			dVecOrb2.push_back(keypointDescription.orb(iVec2[i], kVecOrb2[i]));
+			tDOrb2 = (clock() - tDOrb2);
+		}
+	}
+	cout << " > done" << endl;
+
+	// write descriptionTimes to json
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "write descriptionTimes to json " << pVec[i] << " ..." << endl;
+		if (controller.useSift() == true) {
+			fileManager.writeTimeToJson(pVec[i] + "_sift1_descriptionTime", "descriptorTimer", tDSift1);
+			fileManager.writeTimeToJson(pVec[i] + "_sift2_descriptionTime", "descriptorTimer", tDSift2);
+		}
+		if (controller.useSurf() == true) {
+			fileManager.writeTimeToJson(pVec[i] + "_surf1_descriptionTime", "descriptorTimer", tDSurf1);
+			fileManager.writeTimeToJson(pVec[i] + "_surf2_descriptionTime", "descriptorTimer", tDSurf1);
+		}
+		if (controller.useBrisk() == true) {
+			fileManager.writeTimeToJson(pVec[i] + "_brisk1_descriptionTime", "descriptorTimer", tDBrisk1);
+			fileManager.writeTimeToJson(pVec[i] + "_brisk2_descriptionTime", "descriptorTimer", tDBrisk2);
+		}
+		if (controller.useFreak() == true) {
+			fileManager.writeTimeToJson(pVec[i] + "_freak1_descriptionTime", "descriptorTimer", tDFreak1);
+			fileManager.writeTimeToJson(pVec[i] + "_freak2_descriptionTime", "descriptorTimer", tDFreak2);
+		}
+		if (controller.useOrb() == true) {
+			fileManager.writeTimeToJson(pVec[i] + "_orb1_descriptionTime", "descriptorTimer", tDOrb1);
+			fileManager.writeTimeToJson(pVec[i] + "_orb2_descriptionTime", "descriptorTimer", tDOrb2);
+		}
 	}
 	cout << " > done" << endl;
 
@@ -240,13 +280,23 @@ int main(int argc, char** argv) {
 	// #################### filter by ratio ####################
 	// building a vector of matches for each image-pair
 	vector<vector<DMatch>> matchVecSift, matchVecSurf, matchVecBrisk, matchVecFreak, matchVecOrb;
+	//for (int i = 0; i < pVec.size(); ++i) {
+	//	cout << "determine matches for " << pVec[i] << " ..." << endl;
+	//	if (controller.useSift() == true) matchVecSift.push_back(keypointMatcher.ratioMatcher(NORM_L2, descVecSift[i][0], descVecSift[i][1]));
+	//	if (controller.useSurf() == true) matchVecSurf.push_back(keypointMatcher.ratioMatcher(NORM_L2, descVecSurf[i][0], descVecSurf[i][1]));
+	//	if (controller.useBrisk() == true) matchVecBrisk.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, descVecBrisk[i][0], descVecBrisk[i][1]));
+	//	if (controller.useFreak() == true) matchVecFreak.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, descVecFreak[i][0], descVecFreak[i][1]));
+	//	if (controller.useOrb() == true) matchVecOrb.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, descVecOrb[i][0], descVecOrb[i][1]));
+
+	//}
+	//cout << " > done" << endl;
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "determine matches for " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) matchVecSift.push_back(keypointMatcher.ratioMatcher(NORM_L2, descVecSift[i][0], descVecSift[i][1]));
-		if (controller.useSurf() == true) matchVecSurf.push_back(keypointMatcher.ratioMatcher(NORM_L2, descVecSurf[i][0], descVecSurf[i][1]));
-		if (controller.useBrisk() == true) matchVecBrisk.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, descVecBrisk[i][0], descVecBrisk[i][1]));
-		if (controller.useFreak() == true) matchVecFreak.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, descVecFreak[i][0], descVecFreak[i][1]));
-		if (controller.useOrb() == true) matchVecOrb.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, descVecOrb[i][0], descVecOrb[i][1]));
+		if (controller.useSift() == true) matchVecSift.push_back(keypointMatcher.ratioMatcher(NORM_L2, dVecSift1[i], dVecSift2[i]));
+		if (controller.useSurf() == true) matchVecSurf.push_back(keypointMatcher.ratioMatcher(NORM_L2, dVecSurf1[i], dVecSurf2[i]));
+		if (controller.useBrisk() == true) matchVecBrisk.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, dVecBrisk1[i], dVecBrisk2[i]));
+		if (controller.useFreak() == true) matchVecFreak.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, dVecFreak1[i], dVecFreak2[i]));
+		if (controller.useOrb() == true) matchVecOrb.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, dVecOrb1[i], dVecOrb2[i]));
 
 	}
 	cout << " > done" << endl;

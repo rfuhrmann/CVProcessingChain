@@ -76,10 +76,32 @@ void FileManager::writeMatchesToJson(string path, string object, vector<DMatch>&
 	Value mObject(kObjectType);
 	Value mName;
 	mName.SetString(path.c_str(), allocator);
-	doc[object.c_str()].AddMember(mName, matches.size(), allocator);
+	doc[object.c_str()].AddMember(mName,kpSize, allocator);
 
 	writeJsonFromDocument(::fileName, doc);
 }
+
+// write #Times to json
+/*
+in                   :  name/path in json
+:  matches
+return               :
+*/
+void FileManager::writeTimeToJson(string path, string object, clock_t time) {
+	Document doc;
+	loadJsonToDocument(::fileName, doc);
+	//d.SetObject(); //needed if creating new doc, without loading file
+	Document::AllocatorType& allocator = doc.GetAllocator();
+
+	//########## create object ##########
+	Value tObject(kObjectType);
+	Value tName;
+	tName.SetString(path.c_str(), allocator);
+	doc[object.c_str()].AddMember(tName, (double)time / CLOCKS_PER_SEC, allocator);
+
+	writeJsonFromDocument(::fileName, doc);
+}
+
 
 void FileManager::loadJsonToDocument(string path, Document& doc) {
 	FILE* fp = fopen(path.c_str(), "rb"); // non-Windows use "r"
@@ -107,8 +129,13 @@ void FileManager::createEmptyJson(string path) {
 
 	Value kpObj(kObjectType);
 	Value mObj(kObjectType);
-	Value realKpObj(kObjectType);
 	Value realMObj(kObjectType);
+
+	Value detectorTimerObj(kObjectType);
+	Value descriptorTimerObj(kObjectType);
+	Value mTimerObj(kObjectType);
+	//Value kpTimerObj(kObjectType);
+	//Value mTimerObj(kObjectType);
 	//Value kpName, mName;
 	//Value objArray(kArrayType);
 	//array.PushBack("hello", allocator).PushBack("world", allocator);
@@ -118,8 +145,13 @@ void FileManager::createEmptyJson(string path) {
 	//obj.AddMember(objName, 100, allocator);
 	doc.AddMember("keypoints", kpObj, allocator);
 	doc.AddMember("matches", mObj, allocator);
-	doc.AddMember("realKeypoints", realKpObj, allocator);
 	doc.AddMember("realMatches", realMObj, allocator);
+
+	doc.AddMember("detectorTimer", detectorTimerObj, allocator);
+	doc.AddMember("descriptorTimer", descriptorTimerObj, allocator);
+	doc.AddMember("matchesTimer", mTimerObj, allocator);
+	//timerObj.AddMember("kpTime", kpTimerObj, allocator);
+	//timerObj.AddMember("matchTime", mTimerObj, allocator);
 
 	writeJsonFromDocument(::fileName, doc);
 }

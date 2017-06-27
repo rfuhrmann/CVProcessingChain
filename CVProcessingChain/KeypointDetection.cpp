@@ -22,27 +22,13 @@ using namespace cv::xfeatures2d;
 
 }
 
- // function calls keypoint detectors functions
- /*
- in                   :  input image
- return               :  vector of input image and all keypoint images
- */
-vector<Mat> KeypointDetection::run(Mat& img, const char* imageName, bool showImage, bool writeFile) {
-	vector<Mat> images;
-	images.push_back(img);
-	//images.push_back(surf(img));
-	surf(img, imageName, showImage, writeFile);
-	mser(img, imageName, showImage, writeFile);
-	return images;
-}
-
 // surf keypoint detection
 // scale-invariant feature transform
 /*
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -56,16 +42,6 @@ vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool s
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 		imshow("Keypoints: " + String(imageName) + "_SIFT", img2);
 	}
-
-	//-- (over)Write keypoints to file (create file if non exists)
-	if (writeFile) {
-		string filename = imageName;
-		//filename += "_sift.dat";
-		writeKeypoints(filename.c_str(), keypoints);
-	}
-	//write keypoints to json document
-	//FileManager fileManager;
-	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -75,7 +51,7 @@ vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool s
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -83,22 +59,12 @@ vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool s
 	Ptr<SURF> detector = SURF::create(minHessian);
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
-
 	
 	//-- Show detected (drawn) keypoints
 	if (showImage) {
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 		imshow("Keypoints: " + String(imageName) + "_SURF", img2);
 	}
-	//-- (over)Write keypoints to file (create file if non exists)
-	if (writeFile) {
-		string filename = imageName;
-		//filename += "_surf.dat";
-		writeKeypoints(filename.c_str(), keypoints);
-	}
-	//write keypoints to json document
-	//FileManager fileManager;
-	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -108,7 +74,7 @@ vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool s
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -120,15 +86,6 @@ vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool s
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 		imshow("Keypoints: " + String(imageName) + "_SURF", img2);
 	}
-	//-- (over)Write keypoints to file (create file if non exists)
-	if (writeFile) {
-		string filename = imageName;
-		//filename += "_surf.dat";
-		writeKeypoints(filename.c_str(), keypoints);
-	}
-	//write keypoints to json document
-	//FileManager fileManager;
-	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -138,7 +95,7 @@ vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool s
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 
@@ -159,21 +116,11 @@ vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool s
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 
-
 	//-- Show detected (drawn) keypoints
 	if (showImage) {
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 		imshow("Keypoints: " + String(imageName) + "_MSER", img2);
 	}
-	//-- (over)Write keypoints to file (create file if non exists)
-	if (writeFile) {
-		string filename = imageName;
-		//filename += "_mser.dat";
-		writeKeypoints(filename.c_str(), keypoints);
-	}
-	//write keypoints to json document
-	//FileManager fileManager;
-	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -184,7 +131,7 @@ vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool s
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -197,15 +144,6 @@ vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool 
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 		imshow("Keypoints: " + String(imageName) + "_BRISK", img2);
 	}
-	//-- (over)Write keypoints to file (create file if non exists)
-	if (writeFile) {
-		string filename = imageName;
-		//filename += "_brisk.dat";
-		writeKeypoints(filename.c_str(), keypoints);
-	}
-	//write keypoints to json document
-	//FileManager fileManager;
-	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 
@@ -216,7 +154,7 @@ vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool 
 img         :  input image
 return      :  the result image
 */
-vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool showImage, bool writeFile) {
+vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
@@ -224,20 +162,11 @@ vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool sh
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 
-
 	//-- Show detected (drawn) keypoints
 	if (showImage) {
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
 		imshow("Keypoints: " + String(imageName) + "_ORB", img2);
 	}
-	//-- (over)Write keypoints to file (create file if non exists)
-	if (writeFile) {
-		string filename = imageName;
-		writeKeypoints(filename.c_str(), keypoints);
-	}
-	//write keypoints to json document
-	//FileManager fileManager;
-	//fileManager.writeKeypointsToJson(imageName, keypoints);
 	return keypoints;
 }
 

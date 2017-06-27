@@ -19,19 +19,19 @@ list<string> keypointFiles;
 bool original = false; //the original image
 bool rgb = true; //rgb color space for greyscale conversion
 bool yCrCb = false; //rgb color space for greyscale conversion
-bool histEqual = true; //histogram equalization, global contrast enhancement
+bool histEqual = false; //histogram equalization, global contrast enhancement
 bool clahe = false; //clahe filter, Contrast Limited Adaptive Histogram Equalization
-bool bilateral = false; //bilateral filter, blurring
+bool bilateral = true; //bilateral filter, blurring
 bool nlm = false; //non local mean filter, blurring
 
 //verschiedene methoden zur grauwert umwandlung
 
-bool sift = false; //Scale-invariant feature transform
+bool sift = true; //Scale-invariant feature transform
 bool surf = true; //Speeded Up Robust Features
 bool mser = false; //Maximally Stable Extremal Regions
-bool brisk = false; //Binary Robust Invariant Scalable Keypoints
-bool freak = false; //Fast REtinA Keypoint - Descriptor only, uses fast detector
-bool orb = false; //Oriented FAST and Rotated BRIEF
+bool brisk = true; //Binary Robust Invariant Scalable Keypoints
+bool freak = true; //Fast REtinA Keypoint - Descriptor only, uses fast detector
+bool orb = true; //Oriented FAST and Rotated BRIEF
 
 //threshold for max distance of a match (distance of keypoints)
 int thresh = 1000;
