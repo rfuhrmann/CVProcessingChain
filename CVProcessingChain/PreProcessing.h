@@ -21,21 +21,17 @@ class PreProcessing{
       // destructor
       ~PreProcessing(void){};
         
-      // processing routines
-      // start image restoration
-
-      // testing routine
+      
       void test(void);
 	  //change colorspace
-	  Mat rgb(Mat&);
+	  Mat gray(Mat&);
+	  Mat weightedGray(Mat&);
 	  Mat yCrCb(Mat&);
-	  //contrast enhancement
-	  Mat histogramEqualisation(Mat&);
-	  Mat clahe(Mat&);
-	  //denoising
-	  Mat nlmDenoising(Mat&);
-	  //blur
-	  Mat bilateralFiltering(Mat&);
+	  Mat luv(Mat&);
+	  Mat histogramEqualisation(Mat&);//contrast enhancement global
+	  Mat clahe(Mat&);//contrast enhancement lokal
+	  Mat nlmDenoising(Mat&);//denoising
+	  Mat bilateralFiltering(Mat&);//blur
 
 	  //convert image to 
 	  

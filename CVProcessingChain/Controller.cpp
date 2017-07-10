@@ -17,21 +17,23 @@ vector<string> keypointDetectors;
 list<string> keypointFiles;
 
 bool original = false; //the original image
-bool rgb = true; //rgb color space for greyscale conversion
-bool yCrCb = false; //rgb color space for greyscale conversion
-bool histEqual = false; //histogram equalization, global contrast enhancement
-bool clahe = false; //clahe filter, Contrast Limited Adaptive Histogram Equalization
+bool gray = true; //rgb color space for greyscale conversion
+bool weightedGray = true; //rgb color space for weighted greyscale conversion
+bool yCrCb = true; //YCrCb color space for greyscale conversion
+bool luv = true; //Luv color space for greyscale conversion
+bool histEqual = true; //histogram equalization, global contrast enhancement
+bool clahe = true; //clahe filter, Contrast Limited Adaptive Histogram Equalization
 bool bilateral = true; //bilateral filter, blurring
-bool nlm = false; //non local mean filter, blurring
+bool nlm = true; //non local mean filter, blurring
 
 //verschiedene methoden zur grauwert umwandlung
 
 bool sift = true; //Scale-invariant feature transform
-bool surf = true; //Speeded Up Robust Features
+bool surf = false; //Speeded Up Robust Features
 bool mser = false; //Maximally Stable Extremal Regions
-bool brisk = true; //Binary Robust Invariant Scalable Keypoints
+bool brisk = false; //Binary Robust Invariant Scalable Keypoints
 bool freak = true; //Fast REtinA Keypoint - Descriptor only, uses fast detector
-bool orb = true; //Oriented FAST and Rotated BRIEF
+bool orb = false; //Oriented FAST and Rotated BRIEF
 
 //threshold for max distance of a match (distance of keypoints)
 int thresh = 1000;
@@ -40,8 +42,10 @@ Controller::Controller()
 {
 	preProcessors.clear();
 	if (original) preProcessors.push_back("original");
-	if (rgb) preProcessors.push_back("rgb");
+	if (gray) preProcessors.push_back("gray");
+	if (weightedGray) preProcessors.push_back("weightedGray");
 	if (yCrCb) preProcessors.push_back("yCrCb");
+	if (luv) preProcessors.push_back("luv");
 	if (histEqual) preProcessors.push_back("histEqual");
 	if (clahe) preProcessors.push_back("clahe");
 	if (nlm) preProcessors.push_back("nlm");
@@ -73,11 +77,17 @@ vector<string> Controller::getPreProcessors() {
 bool Controller::useOriginal() {
 	return original;
 }
-bool Controller::useRGB() {
-	return rgb;
+bool Controller::useGray() {
+	return gray;
+}
+bool Controller::useWeightedGray() {
+	return weightedGray;
 }
 bool Controller::useYCrCb() {
 	return yCrCb;
+}
+bool Controller::useLuv() {
+	return luv;
 }
 bool Controller::useHistEqual() {
 	return histEqual;

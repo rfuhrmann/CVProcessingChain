@@ -36,6 +36,7 @@ vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool s
 	Ptr<SIFT> detector = SIFT::create(minHessian);
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
+	//cout << "SIZESIZE " << keypoints.at(0).size() << endl;
 
 	//-- Show detected (drawn) keypoints
 	if (showImage) {

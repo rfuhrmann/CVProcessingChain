@@ -26,14 +26,18 @@ vector<DMatch> KeypointMatcher::ratioMatcher(int type, Mat& descriptors1, Mat& d
 	vector<vector<DMatch>> matches;
 	vector<DMatch> goodMatches;
 
-	BFMatcher matcher(type, false);
-	matcher.knnMatch(descriptors1, descriptors2, matches, 2);
-
+	BFMatcher matcher(type, true); //arg1: Type (flann, bf), arg2: chrosscheck
+	matcher.knnMatch(descriptors1, descriptors2, matches, 1); //arg4: 1 for crosscheck, 2 for ratio-test
 	for (int i = 0; i < matches.size(); ++i) {
+		//for ratio-test
 		//take match if distance in 1st match is min. 25% smaller than distance in 2nd match
-		if (matches[i][0].distance < 0.75*matches[i][1].distance) goodMatches.push_back(matches[i][0]);
+		//if (matches[i][0].distance < 0.75*matches[i][1].distance) goodMatches.push_back(matches[i][0]); //ratio test
+		
+		//for crosscheck
+		if (matches[i].empty() == false) {
+			goodMatches.push_back(matches[i][0]);
+		}
 	}
-
 	matches.clear();
 
 	return goodMatches;
@@ -75,15 +79,15 @@ void KeypointMatcher::ransacFilter(vector<KeyPoint>& keypointsObject, vector<Key
 }
 
 // filter matches by known homography
-void KeypointMatcher::homographyFilter(vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H) {
+float KeypointMatcher::homographyFilter(vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H) {
 
 	//if keypoints empty -> erase all matches and return
 	if (keypoints1.empty()) {
 		matches.clear();
-		return;
+		return -1;
 	}
 	//if matches empty -> return
-	if (matches.empty()) return;
+	if (matches.empty()) return -1;
 
 	int tolerance = 10;
 	vector<Point3f> v1, v2;
@@ -95,10 +99,18 @@ void KeypointMatcher::homographyFilter(vector<KeyPoint>& keypoints1, vector<KeyP
 	// determine the correct point in v2
 	transform(v1, v1, H);
 
-	// check if correct points in v1 correlate to matched points in v2 -> erase if don`t
+	//avg distance
+	float dX, dY, dTotal = 0;
+
+	// check if correct points in v1 correlate to matched points in v2 -> erase if they don`t
 	for (int i = matches.size() - 1; i >= 0; --i) {
-		if (abs(v1[i].x - v2[i].x) > tolerance || abs(v1[i].y - v2[i].y) > tolerance) {
+		dX = abs(v1[i].x - v2[i].x);
+		dY = abs(v1[i].y - v2[i].y);
+		if ( dX > tolerance || dY > tolerance) {
 			matches.erase(matches.begin() + i);
+		} else {
+			dTotal += sqrt(dX*dX + dY*dY);
 		}
 	}
+	return dTotal;
 }

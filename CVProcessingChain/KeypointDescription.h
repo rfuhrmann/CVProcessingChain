@@ -34,10 +34,10 @@ public:
 	//vector<DMatch> freak1(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
 
 	vector<Mat> sift(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
-	vector<Mat> surf(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
-	vector<Mat> orb(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
-	vector<Mat> brisk(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
-	vector<Mat> freak(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
+	//vector<Mat> surf(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
+	//vector<Mat> orb(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
+	//vector<Mat> brisk(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
+	//vector<Mat> freak(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2);
 
 	Mat sift(Mat& img, vector<KeyPoint> kp);
 	Mat surf(Mat& img, vector<KeyPoint> kp);

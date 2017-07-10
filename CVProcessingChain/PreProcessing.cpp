@@ -16,16 +16,60 @@
 
 
 
-
-Mat PreProcessing::rgb(Mat& img) {
-	Mat img2;
-	img.convertTo(img2, CV_8UC1);
+// grayscale conversion from BGR color space
+/*
+img         :  input image
+return      :  the result image
+*/
+Mat PreProcessing::gray(Mat& img) {
+	Mat img2 = Mat::zeros(img.size(), CV_8UC1);
+	vector<Mat> planes; 
+	split(img, planes);
+	divide(planes[0], 3, planes[0]);
+	divide(planes[1], 3, planes[1]);
+	divide(planes[2], 3, planes[2]);
+	add(planes[0], planes[1], img2);
+	add(img2, planes[2], img2);
+	//img2 = (planes[0]/3 + planes[1]/3 + planes[2]/3);
 	return img2;
 }
+
+// weighted grayscale conversion from BGR color space
+/*
+img         :  input image
+return      :  the result image
+*/
+Mat PreProcessing::weightedGray(Mat& img) {
+	Mat img2;
+	cvtColor(img, img2, CV_BGR2GRAY);
+	//img.convertTo(img2, CV_8UC1);
+	return img2;
+}
+
+// grayscale conversion from YCrCb color space
+/*
+img         :  input image
+return      :  the result image
+*/
 Mat PreProcessing::yCrCb(Mat& img) {
 	Mat img2;
+	vector<Mat> planes;
 	cvtColor(img, img2, COLOR_BGR2YCrCb);
-	return img2;
+	split(img2, planes);
+	return planes[0];
+}
+
+// grayscale conversion from Luv color space
+/*
+img         :  input image
+return      :  the result image
+*/
+Mat PreProcessing::luv(Mat& img) {
+	Mat img2;
+	vector<Mat> planes;
+	cvtColor(img, img2, COLOR_BGR2Luv);
+	split(img2, planes);
+	return planes[0];
 }
 // histogram equalization for global contrat enhancement
 /*
@@ -33,9 +77,7 @@ img         :  input image
 return      :  the result image
 */
 Mat PreProcessing::histogramEqualisation(Mat& img) {
-	//Mat img2 = Mat::zeros(img.size(), img.type());
-	Mat img2 = img.clone();
-	//img2.convertTo(img2, CV_8UC1);
+	Mat img2 = weightedGray(img);
 	equalizeHist(img2, img2);
 	return img2;
 }
@@ -48,8 +90,9 @@ img         :  input image
 return      :  the result image
 */
 Mat PreProcessing::clahe(Mat& img) {
-	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
+	//Mat img2 = img.clone();
+	Mat img2 = weightedGray(img);
+	//img2.convertTo(img2, CV_8UC1);
 
 	Ptr<CLAHE> clahe = createCLAHE();
 	clahe->setClipLimit(8);
@@ -63,9 +106,10 @@ img         :  input image
 return      :  the blurred image
 */
 Mat PreProcessing::bilateralFiltering(Mat& img) {
-	Mat img2 = img.clone();
+	//Mat img2 = img.clone();
+	Mat img2 = weightedGray(img);
 	Mat img3 = Mat::zeros(img2.size(), img2.type());
-	img2.convertTo(img2, CV_8UC1);
+	//img2.convertTo(img2, CV_8UC1);
 	bilateralFilter(img2, img3, 5, 80, 80);
 	return img3;
 }
@@ -76,8 +120,9 @@ img         :  input image
 return      :  the blurred image
 */
 Mat PreProcessing::nlmDenoising(Mat& img) {
-	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
+	Mat img2 = weightedGray(img);
+	//Mat img2 = img.clone();
+	//img2.convertTo(img2, CV_8UC1);
 	fastNlMeansDenoising(img2, img2, 3, 7, 5); //prefered: 3,7,21
 	return img2;
 }

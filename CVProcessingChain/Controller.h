@@ -21,8 +21,10 @@ public:
 
 	vector<string> getPreProcessors(void);
 	bool useOriginal(void); 
-	bool useRGB(void);
+	bool useGray(void);
+	bool useWeightedGray(void);
 	bool useYCrCb(void);
+	bool useLuv(void);
 	bool useHistEqual(void);
 	bool useClahe(void);
 	bool useNlm(void);

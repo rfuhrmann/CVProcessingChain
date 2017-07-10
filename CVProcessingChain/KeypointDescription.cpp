@@ -29,65 +29,65 @@ using namespace cv::xfeatures2d;
 //	return img;
 //}
 
-vector<Mat> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
-	img1.convertTo(img1, CV_8UC1);
-	img2.convertTo(img2, CV_8UC1);
-	Ptr<SIFT> detector = SIFT::create();
-	Mat descriptors1, descriptors2;
-
-	detector->compute(img1, kp1, descriptors1);
-	detector->compute(img2, kp2, descriptors2);
-	//cout << "sift-vSize " << descriptors1.size() << endl;
-	return { descriptors1, descriptors2 };
-}
-
-vector<Mat> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
-	img1.convertTo(img1, CV_8UC1);
-	img2.convertTo(img2, CV_8UC1);
-	Ptr<SURF> detector = SURF::create();
-	Mat descriptors1, descriptors2;
-
-	detector->compute(img1, kp1, descriptors1);
-	detector->compute(img2, kp2, descriptors2);
-	//cout << "surf-vSize " << descriptors1.size() << endl;
-	return{ descriptors1, descriptors2 };
-}
-
-vector<Mat> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
-	img1.convertTo(img1, CV_8UC1);
-	img2.convertTo(img2, CV_8UC1);
-	Ptr<BRISK> detector = BRISK::create();
-	Mat descriptors1, descriptors2;
-
-	detector->compute(img1, kp1, descriptors1);
-	detector->compute(img2, kp2, descriptors2);
-	//cout << "brisk-vSize " << descriptors1.size() << endl;
-	return{ descriptors1, descriptors2 };
-}
-
-vector<Mat> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
-	img1.convertTo(img1, CV_8UC1);
-	img2.convertTo(img2, CV_8UC1);
-	Ptr<FREAK> detector = FREAK::create();
-	Mat descriptors1, descriptors2;
-
-	detector->compute(img1, kp1, descriptors1);
-	detector->compute(img2, kp2, descriptors2);
-	//cout << "freak-vSize " << descriptors1.size() << endl;
-	return{ descriptors1, descriptors2 };
-}
-
-vector<Mat> KeypointDescription::orb(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
-	img1.convertTo(img1, CV_8UC1);
-	img2.convertTo(img2, CV_8UC1);
-	Ptr<ORB> detector = ORB::create();
-	Mat descriptors1, descriptors2;
-
-	detector->compute(img1, kp1, descriptors1);
-	detector->compute(img2, kp2, descriptors2);
-	//cout << "orb-vSize " << descriptors1.size() << endl;
-	return{ descriptors1, descriptors2 };
-}
+//vector<Mat> KeypointDescription::sift(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+//	img1.convertTo(img1, CV_8UC1);
+//	img2.convertTo(img2, CV_8UC1);
+//	Ptr<SIFT> detector = SIFT::create();
+//	Mat descriptors1, descriptors2;
+//
+//	detector->compute(img1, kp1, descriptors1);
+//	detector->compute(img2, kp2, descriptors2);
+//	//cout << "sift-vSize " << descriptors1.size() << endl;
+//	return { descriptors1, descriptors2 };
+//}
+//
+//vector<Mat> KeypointDescription::surf(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+//	img1.convertTo(img1, CV_8UC1);
+//	img2.convertTo(img2, CV_8UC1);
+//	Ptr<SURF> detector = SURF::create();
+//	Mat descriptors1, descriptors2;
+//
+//	detector->compute(img1, kp1, descriptors1);
+//	detector->compute(img2, kp2, descriptors2);
+//	//cout << "surf-vSize " << descriptors1.size() << endl;
+//	return{ descriptors1, descriptors2 };
+//}
+//
+//vector<Mat> KeypointDescription::brisk(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+//	img1.convertTo(img1, CV_8UC1);
+//	img2.convertTo(img2, CV_8UC1);
+//	Ptr<BRISK> detector = BRISK::create();
+//	Mat descriptors1, descriptors2;
+//
+//	detector->compute(img1, kp1, descriptors1);
+//	detector->compute(img2, kp2, descriptors2);
+//	//cout << "brisk-vSize " << descriptors1.size() << endl;
+//	return{ descriptors1, descriptors2 };
+//}
+//
+//vector<Mat> KeypointDescription::freak(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+//	img1.convertTo(img1, CV_8UC1);
+//	img2.convertTo(img2, CV_8UC1);
+//	Ptr<FREAK> detector = FREAK::create();
+//	Mat descriptors1, descriptors2;
+//
+//	detector->compute(img1, kp1, descriptors1);
+//	detector->compute(img2, kp2, descriptors2);
+//	//cout << "freak-vSize " << descriptors1.size() << endl;
+//	return{ descriptors1, descriptors2 };
+//}
+//
+//vector<Mat> KeypointDescription::orb(Mat& img1, vector<KeyPoint> kp1, Mat& img2, vector<KeyPoint> kp2) {
+//	img1.convertTo(img1, CV_8UC1);
+//	img2.convertTo(img2, CV_8UC1);
+//	Ptr<ORB> detector = ORB::create();
+//	Mat descriptors1, descriptors2;
+//
+//	detector->compute(img1, kp1, descriptors1);
+//	detector->compute(img2, kp2, descriptors2);
+//	//cout << "orb-vSize " << descriptors1.size() << endl;
+//	return{ descriptors1, descriptors2 };
+//}
 
 //###################################### single image #################################################
 
