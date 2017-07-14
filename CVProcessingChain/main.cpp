@@ -240,7 +240,7 @@ int main(int argc, char** argv) {
 	// filter matches by threshold
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "filter matches by threshold for " << pVec[i] << " ..." << endl;
-		cout << "thresh: " << controller.getThreshold() << endl;
+		//cout << "thresh: " << controller.getThreshold() << endl;
 		if (controller.useSift() == true) keypointMatcher.thresholdFilter(controller.getThreshold(), matchVecSift[i]);
 		if (controller.useSurf() == true) keypointMatcher.thresholdFilter(controller.getThreshold(), matchVecSurf[i]);
 		if (controller.useBrisk() == true) keypointMatcher.thresholdFilter(controller.getThreshold(), matchVecBrisk[i]);
@@ -310,11 +310,18 @@ int main(int argc, char** argv) {
 			totalMatchesOrb += matchVecOrb[i].size();
 		}
 	}
-	avgDistSift = avgDistSift / totalMatchesSift;
-	avgDistSurf = avgDistSurf / totalMatchesSurf;
-	avgDistBrisk = avgDistBrisk / totalMatchesBrisk;
-	avgDistFreak = avgDistFreak / totalMatchesFreak;
-	avgDistOrb = avgDistOrb / totalMatchesOrb;
+	if (totalMatchesSift > 0) avgDistSift = avgDistSift / totalMatchesSift;
+	if (totalMatchesSurf > 0) avgDistSurf = avgDistSurf / totalMatchesSurf;
+	if (totalMatchesBrisk > 0) avgDistBrisk = avgDistBrisk / totalMatchesBrisk;
+	if (totalMatchesFreak > 0) avgDistFreak = avgDistFreak / totalMatchesFreak;
+	if (totalMatchesOrb > 0) avgDistOrb = avgDistOrb / totalMatchesOrb;
+
+	//avgDistSift = (round(avgDistSift * 10000)) / 10000;
+	//avgDistSurf = (round(avgDistSurf * 10000)) / 10000;
+	//avgDistBrisk = (round(avgDistBrisk * 10000)) / 10000;
+	//avgDistFreak = (round(avgDistFreak * 10000)) / 10000;
+	//avgDistOrb = (round(avgDistOrb * 10000)) / 10000;
+
 	cout << " > done" << endl;
 
 	// write realMatches to json
@@ -328,13 +335,23 @@ int main(int argc, char** argv) {
 	}
 	cout << " > done" << endl;
 
+	// write avgDistHomography to json
+	cout << "write avgDistHomography to json " << " ..." << endl;
+	if (controller.useSift() == true) fileManager.writeDistanceToJson("sift_avgDistHom", "avgDistHomography", avgDistSift);
+	if (controller.useSurf() == true) fileManager.writeDistanceToJson("surf_avgDistHom", "avgDistHomography", avgDistSurf);
+	if (controller.useBrisk() == true) fileManager.writeDistanceToJson("brisk_avgDistHom", "avgDistHomography", avgDistBrisk);
+	if (controller.useFreak() == true) fileManager.writeDistanceToJson("freak_avgDistHom", "avgDistHomography", avgDistFreak);
+	if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_avgDistHom", "avgDistHomography", avgDistOrb);
+	cout << " > done" << endl;
+
+	//cout << "distances: " << endl << avgDistSift << endl << avgDistSurf << endl << avgDistBrisk << endl << avgDistFreak << endl << avgDistOrb << endl;
 	//// write avgDistHomography to json
 	//cout << "write avgDistHomography to json " << " ..." << endl;
-	//if (controller.useSift() == true) fileManager.writeDistanceToJson("sift_avgDistHom", "avgDistHomography", avgDistSift);
-	//if (controller.useSurf() == true) fileManager.writeDistanceToJson("surf_avgDistHom", "avgDistHomography", avgDistSurf);
-	//if (controller.useBrisk() == true) fileManager.writeDistanceToJson("brisk_avgDistHom", "avgDistHomography", avgDistBrisk);
-	//if (controller.useFreak() == true) fileManager.writeDistanceToJson("freak_avgDistHom", "avgDistHomography", avgDistFreak);
-	//if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_avgDistHom", "avgDistHomography", avgDistOrb);
+	//if (controller.useSift() == true) fileManager.writeDistanceToJson("sift_avgDistHom", "avgDistHomography", (round(avgDistSift*10000))/10000);
+	//if (controller.useSurf() == true) fileManager.writeDistanceToJson("surf_avgDistHom", "avgDistHomography", (round(avgDistSurf * 10000)) / 10000);
+	//if (controller.useBrisk() == true) fileManager.writeDistanceToJson("brisk_avgDistHom", "avgDistHomography", (round(avgDistBrisk * 10000)) / 10000);
+	//if (controller.useFreak() == true) fileManager.writeDistanceToJson("freak_avgDistHom", "avgDistHomography", (round(avgDistFreak * 10000)) / 10000);
+	//if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_avgDistHom", "avgDistHomography", (round(avgDistOrb * 10000)) / 10000);
 	//cout << " > done" << endl;
 
 

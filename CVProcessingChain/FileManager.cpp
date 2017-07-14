@@ -66,7 +66,7 @@ return               :
 */
 void FileManager::writeMatchesToJson(string path, string object, vector<DMatch>& matches) {
 
-	int kpSize = matches.size();
+	//int kpSize = matches.size();
 	Document doc;
 	loadJsonToDocument(::fileName, doc);
 	//d.SetObject(); //needed if creating new doc, without loading file
@@ -76,7 +76,7 @@ void FileManager::writeMatchesToJson(string path, string object, vector<DMatch>&
 	Value mObject(kObjectType);
 	Value mName;
 	mName.SetString(path.c_str(), allocator);
-	doc[object.c_str()].AddMember(mName,kpSize, allocator);
+	doc[object.c_str()].AddMember(mName, matches.size(), allocator);
 
 	writeJsonFromDocument(::fileName, doc);
 }

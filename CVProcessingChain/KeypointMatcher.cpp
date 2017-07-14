@@ -44,7 +44,7 @@ vector<DMatch> KeypointMatcher::ratioMatcher(int type, Mat& descriptors1, Mat& d
 }
 
 void KeypointMatcher::thresholdFilter(int thresh, vector<DMatch>& matches) {
-	cout << "before-thresh matches: " << matches.size() << endl;
+	//cout << "before-thresh matches: " << matches.size() << endl;
 	for (int i = matches.size()-1; i >= 0; --i) {
 		
 		if (matches[i].distance > thresh) matches.erase(matches.begin() + i);
@@ -81,6 +81,8 @@ void KeypointMatcher::ransacFilter(vector<KeyPoint>& keypointsObject, vector<Key
 // filter matches by known homography
 float KeypointMatcher::homographyFilter(vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H) {
 
+	cout << "HOMOGRAPHYFILTER" << endl;
+
 	//if keypoints empty -> erase all matches and return
 	if (keypoints1.empty()) {
 		matches.clear();
@@ -100,15 +102,18 @@ float KeypointMatcher::homographyFilter(vector<KeyPoint>& keypoints1, vector<Key
 	transform(v1, v1, H);
 
 	//avg distance
-	float dX, dY, dTotal = 0;
+	float dX, dY, dXY, dTotal = 0;
 
 	// check if correct points in v1 correlate to matched points in v2 -> erase if they don`t
 	for (int i = matches.size() - 1; i >= 0; --i) {
 		dX = abs(v1[i].x - v2[i].x);
 		dY = abs(v1[i].y - v2[i].y);
-		if ( dX > tolerance || dY > tolerance) {
+		dXY = sqrt(dX*dX + dY*dY);
+		cout << dXY << endl;
+		if (dXY > tolerance) {
 			matches.erase(matches.begin() + i);
-		} else {
+		}
+		else {
 			dTotal += sqrt(dX*dX + dY*dY);
 		}
 	}

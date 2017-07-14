@@ -18,13 +18,13 @@ list<string> keypointFiles;
 
 bool original = false; //the original image
 bool gray = true; //rgb color space for greyscale conversion
-bool weightedGray = true; //rgb color space for weighted greyscale conversion
-bool yCrCb = true; //YCrCb color space for greyscale conversion
-bool luv = true; //Luv color space for greyscale conversion
-bool histEqual = true; //histogram equalization, global contrast enhancement
-bool clahe = true; //clahe filter, Contrast Limited Adaptive Histogram Equalization
-bool bilateral = true; //bilateral filter, blurring
-bool nlm = true; //non local mean filter, blurring
+bool weightedGray = false; //rgb color space for weighted greyscale conversion
+bool yCrCb = false; //YCrCb color space for greyscale conversion
+bool luv = false; //Luv color space for greyscale conversion
+bool histEqual = false; //histogram equalization, global contrast enhancement
+bool clahe = false; //clahe filter, Contrast Limited Adaptive Histogram Equalization
+bool bilateral = false; //bilateral filter, blurring
+bool nlm = false; //non local mean filter, blurring
 
 //verschiedene methoden zur grauwert umwandlung
 
