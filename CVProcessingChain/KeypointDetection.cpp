@@ -90,41 +90,6 @@ vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool s
 	return keypoints;
 }
 
-// mser keypoint detection
-// Maximally Stable Extremal Regions
-/*
-img         :  input image
-return      :  the result image
-*/
-vector<KeyPoint> KeypointDetection::mser(Mat& img, const char* imageName, bool showImage) {
-	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
-
-	//########## extendet version ##########
-	//vector< vector< Point> > contours;
-	//vector< Rect> bboxes;
-	//Ptr<MSER> mser = MSER::create(21, (int)(0.00002*img2.cols*img2.rows), (int)(0.05*img2.cols*img2.rows), 1, 0.7);
-	//mser->detectRegions(img2, contours, bboxes);
-
-	//for (int i = 0; i < bboxes.size(); i++)
-	//{
-	//	rectangle(img2, bboxes[i], CV_RGB(0, 255, 0));
-	//}
-
-	//-- Step 1: Detect the keypoints using SURF Detector
-	//int minHessian = 400;
-	Ptr<MSER> detector = MSER::create();
-	vector<KeyPoint> keypoints;
-	detector->detect(img2, keypoints);
-
-	//-- Show detected (drawn) keypoints
-	if (showImage) {
-		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
-		imshow("Keypoints: " + String(imageName) + "_MSER", img2);
-	}
-	return keypoints;
-}
-
 
 // mser keypoint detection
 //Binary Robust Invariant Scalable Keypoints

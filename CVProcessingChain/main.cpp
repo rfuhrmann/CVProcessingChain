@@ -88,11 +88,11 @@ int main(int argc, char** argv) {
 
 	// #################### detection ####################
 	// building a vector of keypoints for each image in iList
-	vector<vector<KeyPoint>> kVecSift1, kVecSurf1, kVecMser1, kVecBrisk1, kVecFreak1, kVecOrb1;
-	vector<vector<KeyPoint>> kVecSift2, kVecSurf2, kVecMser2, kVecBrisk2, kVecFreak2, kVecOrb2;
+	vector<vector<KeyPoint>> kVecSift1, kVecSurf1, kVecBrisk1, kVecFreak1, kVecOrb1;
+	vector<vector<KeyPoint>> kVecSift2, kVecSurf2, kVecBrisk2, kVecFreak2, kVecOrb2;
 	vector<vector<vector<KeyPoint>>> helperKeypoints{kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2};
 	DetectionHelper detectionHelper;
-	detectionHelper.runDetection(pVec, iVec1, iVec2, kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecMser1, kVecMser2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2);
+	detectionHelper.runDetection(pVec, iVec1, iVec2, kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2);
 
 
 	// #################### description ####################
@@ -241,11 +241,11 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "filter matches by threshold for " << pVec[i] << " ..." << endl;
 		//cout << "thresh: " << controller.getThreshold() << endl;
-		if (controller.useSift() == true) keypointMatcher.thresholdFilter(controller.getThreshold(), matchVecSift[i]);
-		if (controller.useSurf() == true) keypointMatcher.thresholdFilter(controller.getThreshold(), matchVecSurf[i]);
-		if (controller.useBrisk() == true) keypointMatcher.thresholdFilter(controller.getThreshold(), matchVecBrisk[i]);
-		if (controller.useFreak() == true) keypointMatcher.thresholdFilter(controller.getThreshold(), matchVecFreak[i]);
-		if (controller.useOrb() == true) keypointMatcher.thresholdFilter(controller.getThreshold(), matchVecOrb[i]);
+		if (controller.useSift() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecSift[i]);
+		if (controller.useSurf() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecSurf[i]);
+		if (controller.useBrisk() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecBrisk[i]);
+		if (controller.useFreak() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecFreak[i]);
+		if (controller.useOrb() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecOrb[i]);
 	}
 	cout << " > done" << endl;
 
@@ -290,23 +290,23 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "filter matches by known homography for " << pVec[i] << " ..." << endl;
 		if (controller.useSift() == true) {
-			avgDistSift += keypointMatcher.homographyFilter(kVecSift1[i], kVecSift2[i], matchVecSift[i], H);
+			avgDistSift += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSift1[i], kVecSift2[i], matchVecSift[i], H);
 			totalMatchesSift += matchVecSift[i].size();
 		}
 		if (controller.useSurf() == true) {
-			avgDistSurf += keypointMatcher.homographyFilter(kVecSurf1[i], kVecSurf2[i], matchVecSurf[i], H);
+			avgDistSurf += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSurf1[i], kVecSurf2[i], matchVecSurf[i], H);
 			totalMatchesSurf += matchVecSurf[i].size();
 		}
 		if (controller.useBrisk() == true) {
-			avgDistBrisk += keypointMatcher.homographyFilter(kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i], H);
+			avgDistBrisk += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i], H);
 			totalMatchesBrisk += matchVecBrisk[i].size();
 		}
 		if (controller.useFreak() == true) {
-			avgDistFreak += keypointMatcher.homographyFilter(kVecFreak1[i], kVecFreak2[i], matchVecFreak[i], H);
+			avgDistFreak += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecFreak1[i], kVecFreak2[i], matchVecFreak[i], H);
 			totalMatchesFreak += matchVecFreak[i].size();
 		}
 		if (controller.useOrb() == true) {
-			avgDistOrb += keypointMatcher.homographyFilter(kVecOrb1[i], kVecOrb2[i], matchVecOrb[i], H);
+			avgDistOrb += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecOrb1[i], kVecOrb2[i], matchVecOrb[i], H);
 			totalMatchesOrb += matchVecOrb[i].size();
 		}
 	}

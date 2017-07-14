@@ -33,12 +33,12 @@ public:
 	vector<string> getKeypointDetectors(void);
 	bool useSift(void);
 	bool useSurf(void);
-	bool useMser(void);
 	bool useBrisk(void);
 	bool useFreak(void);
 	bool useOrb(void);
 
-	int getThreshold();
+	int getMatchThreshold();
+	int getHomographyThreshold();
 
 private:
 

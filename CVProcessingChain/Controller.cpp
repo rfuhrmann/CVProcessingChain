@@ -30,13 +30,14 @@ bool nlm = false; //non local mean filter, blurring
 
 bool sift = true; //Scale-invariant feature transform
 bool surf = false; //Speeded Up Robust Features
-bool mser = false; //Maximally Stable Extremal Regions
 bool brisk = false; //Binary Robust Invariant Scalable Keypoints
 bool freak = true; //Fast REtinA Keypoint - Descriptor only, uses fast detector
 bool orb = false; //Oriented FAST and Rotated BRIEF
 
-//threshold for max distance of a match (distance of keypoints)
-int thresh = 1000;
+//threshold for max distance of a match fo rthresholdFilter (distance of keypoints)
+int threshMatches = 1000;
+//threshold for max distance of a match for homographyFilter (distance of deskriptor points)
+int threshHomography = 10;
 
 Controller::Controller()
 {
@@ -54,7 +55,6 @@ Controller::Controller()
 	keypointDetectors.clear();
 	if (sift) keypointDetectors.push_back("sift");
 	if (surf) keypointDetectors.push_back("surf");
-	if (mser) keypointDetectors.push_back("mser");
 	if (brisk) keypointDetectors.push_back("brisk");
 	if (freak) keypointDetectors.push_back("freak");
 	if (orb) keypointDetectors.push_back("orb");
@@ -112,9 +112,6 @@ bool Controller::useSift() {
 bool Controller::useSurf() {
 	return surf;
 }
-bool Controller::useMser() {
-	return mser;
-}
 bool Controller::useBrisk() {
 	return brisk;
 }
@@ -125,6 +122,9 @@ bool Controller::useOrb() {
 	return orb;
 }
 
-int Controller::getThreshold() {
-	return thresh;
+int Controller::getMatchThreshold() {
+	return threshMatches;
+}
+int Controller::getHomographyThreshold() {
+	return threshHomography;
 }

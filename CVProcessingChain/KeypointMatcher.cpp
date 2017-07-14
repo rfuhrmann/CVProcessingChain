@@ -79,7 +79,7 @@ void KeypointMatcher::ransacFilter(vector<KeyPoint>& keypointsObject, vector<Key
 }
 
 // filter matches by known homography
-float KeypointMatcher::homographyFilter(vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H) {
+float KeypointMatcher::homographyFilter(int thresh, vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H) {
 
 	cout << "HOMOGRAPHYFILTER" << endl;
 
@@ -91,7 +91,7 @@ float KeypointMatcher::homographyFilter(vector<KeyPoint>& keypoints1, vector<Key
 	//if matches empty -> return
 	if (matches.empty()) return -1;
 
-	int tolerance = 10;
+	//int tolerance = 10;
 	vector<Point3f> v1, v2;
 
 	for (int i = 0; i < matches.size(); ++i) {
@@ -110,7 +110,7 @@ float KeypointMatcher::homographyFilter(vector<KeyPoint>& keypoints1, vector<Key
 		dY = abs(v1[i].y - v2[i].y);
 		dXY = sqrt(dX*dX + dY*dY);
 		cout << dXY << endl;
-		if (dXY > tolerance) {
+		if (dXY > thresh) {
 			matches.erase(matches.begin() + i);
 		}
 		else {

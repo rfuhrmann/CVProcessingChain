@@ -24,7 +24,6 @@ public:
 	//vector<Mat> run(Mat&, const char* imageName, bool showImage, bool writeFile);
 	vector<KeyPoint> sift(Mat& img, const char* imageName, bool showImage);
 	vector<KeyPoint> surf(Mat& img, const char* imageName, bool showImage);
-	vector<KeyPoint> mser(Mat& img, const char* imageName, bool showImage);
 	vector<KeyPoint> brisk(Mat& img, const char* imageName, bool showImag);
 	vector<KeyPoint> fast(Mat& img, const char* imageName, bool showImage);
 	vector<KeyPoint> orb(Mat& img, const char* imageName, bool showImage);
