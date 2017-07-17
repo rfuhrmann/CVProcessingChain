@@ -80,7 +80,7 @@ vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool s
 	img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
 	vector<KeyPoint> keypoints;
-	FAST(img2, keypoints, 40, false);
+	FAST(img2, keypoints, 40, true);
 
 	//-- Show detected (drawn) keypoints
 	if (showImage) {

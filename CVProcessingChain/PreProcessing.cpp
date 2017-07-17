@@ -7,6 +7,8 @@
 //============================================================================
 
 #include "PreProcessing.h"
+#include <opencv2/opencv.hpp>
+#include <opencv2/xphoto/bm3d_image_denoising.hpp>
 
 
 //The conventional ranges for R, G, and B channel values are :
@@ -42,7 +44,7 @@ return      :  the result image
 Mat PreProcessing::weightedGray(Mat& img) {
 	Mat img2;
 	cvtColor(img, img2, CV_BGR2GRAY);
-	//img.convertTo(img2, CV_8UC1);
+	//img2.convertTo(img2, CV_8UC1);
 	return img2;
 }
 
@@ -77,8 +79,8 @@ img         :  input image
 return      :  the result image
 */
 Mat PreProcessing::histogramEqualisation(Mat& img) {
-	Mat img2 = weightedGray(img);
-	equalizeHist(img2, img2);
+	Mat img2;// = weightedGray(img);
+	equalizeHist(img, img2);
 	return img2;
 }
 
@@ -90,13 +92,12 @@ img         :  input image
 return      :  the result image
 */
 Mat PreProcessing::clahe(Mat& img) {
-	//Mat img2 = img.clone();
-	Mat img2 = weightedGray(img);
+	Mat img2;// = weightedGray(img);
 	//img2.convertTo(img2, CV_8UC1);
 
 	Ptr<CLAHE> clahe = createCLAHE();
 	clahe->setClipLimit(8);
-	clahe->apply(img2, img2);
+	clahe->apply(img, img2);
 	return img2;
 }
 
@@ -106,12 +107,10 @@ img         :  input image
 return      :  the blurred image
 */
 Mat PreProcessing::bilateralFiltering(Mat& img) {
-	//Mat img2 = img.clone();
-	Mat img2 = weightedGray(img);
-	Mat img3 = Mat::zeros(img2.size(), img2.type());
-	//img2.convertTo(img2, CV_8UC1);
-	bilateralFilter(img2, img3, 5, 80, 80);
-	return img3;
+	//Mat img2;// = weightedGray(img);
+	Mat img2 = Mat::zeros(img.size(), img.type());
+	bilateralFilter(img, img2, 5, 80, 80);
+	return img2;
 }
 
 // non local means filter for blurring
@@ -120,10 +119,19 @@ img         :  input image
 return      :  the blurred image
 */
 Mat PreProcessing::nlmDenoising(Mat& img) {
-	Mat img2 = weightedGray(img);
-	//Mat img2 = img.clone();
-	//img2.convertTo(img2, CV_8UC1);
-	fastNlMeansDenoising(img2, img2, 3, 7, 5); //prefered: 3,7,21
+	Mat img2;// = weightedGray(img);
+	fastNlMeansDenoising(img, img2, 3, 7, 5); //prefered: 3,7,21
+	return img2;
+}
+
+// block matching and 3d filtering
+/*
+img         :  input image
+return      :  the denoised image
+*/
+Mat PreProcessing::bm3d(Mat& img) {
+	Mat img2;// = weightedGray(img);
+	xphoto::bm3dDenoising(img, img2, 1.0, 4, 16, 2500, 400, 8, 1, 2.0, 4, 0, 0);
 	return img2;
 }
 

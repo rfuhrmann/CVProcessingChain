@@ -33,6 +33,7 @@ class PreProcessing{
 	  Mat clahe(Mat&);//contrast enhancement lokal
 	  Mat nlmDenoising(Mat&);//denoising
 	  Mat bilateralFiltering(Mat&);//blur
+	  Mat bm3d(Mat&);//denoising
 
 	  //convert image to 
 	  

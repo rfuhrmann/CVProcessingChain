@@ -29,6 +29,8 @@ public:
 	bool useClahe(void);
 	bool useNlm(void);
 	bool useBilateral(void);
+	bool useBM3D(void);
+	//deconvolution with noise estimation
 
 	vector<string> getKeypointDetectors(void);
 	bool useSift(void);

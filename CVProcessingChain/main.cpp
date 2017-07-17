@@ -72,11 +72,11 @@ int main(int argc, char** argv) {
 	}
 	// load homography, path in argv[3]
 	Mat H = processingChainHelper.loadHomography(argv[3]);
-	
-    // convert U8 to 32F
-    //img1.convertTo(img1, CV_32FC1);
+
+	// convert U8 to 32F
+	//img1.convertTo(img1, CV_32FC1);
 	//img2.convertTo(img2, CV_32FC1);
-    cout << " > done" << endl;
+	cout << " > done" << endl;
 
 	// building vectors for preprocessing images including original image
 	vector<Mat> iVec1, iVec2;
@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
 	// building a vector of keypoints for each image in iList
 	vector<vector<KeyPoint>> kVecSift1, kVecSurf1, kVecBrisk1, kVecFreak1, kVecOrb1;
 	vector<vector<KeyPoint>> kVecSift2, kVecSurf2, kVecBrisk2, kVecFreak2, kVecOrb2;
-	vector<vector<vector<KeyPoint>>> helperKeypoints{kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2};
+	vector<vector<vector<KeyPoint>>> helperKeypoints{ kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2 };
 	DetectionHelper detectionHelper;
 	detectionHelper.runDetection(pVec, iVec1, iVec2, kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2);
 
@@ -178,61 +178,129 @@ int main(int argc, char** argv) {
 	cout << " > done" << endl;
 
 	// #################### match ####################
-	// #################### filter by crosscheck ####################
 	// #################### filter by ratio ####################
 	// building a vector of matches for each image-pair
 	vector<vector<DMatch>> matchVecSift, matchVecSurf, matchVecBrisk, matchVecFreak, matchVecOrb;
-	vector<clock_t> tMSift, tMSurf, tMBrisk, tMFreak, tMOrb;
+	vector<clock_t> tRatioSift, tRatioSurf, tRatioBrisk, tRatioFreak, tRatioOrb;
 
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "determine matches for " << pVec[i] << " ..." << endl;
 		if (controller.useSift() == true) {
 			time = clock();
 			matchVecSift.push_back(keypointMatcher.ratioMatcher(NORM_L2, dVecSift1[i], dVecSift2[i]));
-			tMSift.push_back(clock() - time);
+			tRatioSift.push_back(clock() - time);
 		}
 		if (controller.useSurf() == true) {
 			time = clock();
 			matchVecSurf.push_back(keypointMatcher.ratioMatcher(NORM_L2, dVecSurf1[i], dVecSurf2[i]));
-			tMSurf.push_back(clock() - time);
+			tRatioSurf.push_back(clock() - time);
 		}
 		if (controller.useBrisk() == true) {
 			time = clock();
 			matchVecBrisk.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, dVecBrisk1[i], dVecBrisk2[i]));
-			tMBrisk.push_back(clock() - time);
+			tRatioBrisk.push_back(clock() - time);
 		}
 		if (controller.useFreak() == true) {
 			time = clock();
 			matchVecFreak.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, dVecFreak1[i], dVecFreak2[i]));
-			tMFreak.push_back(clock() - time);
+			tRatioFreak.push_back(clock() - time);
 		}
 		if (controller.useOrb() == true) {
 			time = clock();
 			matchVecOrb.push_back(keypointMatcher.ratioMatcher(NORM_HAMMING, dVecOrb1[i], dVecOrb2[i]));
-			tMOrb.push_back(clock() - time);
+			tRatioOrb.push_back(clock() - time);
 		}
 	}
 	cout << " > done" << endl;
 
-	// write matchTimes to json
+
+	// #################### filter by crosscheck ####################
+	vector<vector<DMatch>> crossVecSift, crossVecSurf, crossVecBrisk, crossVecFreak, crossVecOrb;
+	vector<clock_t> tCrossSift, tCrossSurf, tCrossBrisk, tCrossFreak, tCrossOrb;
+
 	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "write matchTimes to json " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) fileManager.writeTimeToJson(pVec[i] + "_sift_matchTime", "matchTimer", tMSift[i]);
-		if (controller.useSurf() == true) fileManager.writeTimeToJson(pVec[i] + "_surf_matchTime", "matchTimer", tMSurf[i]);
-		if (controller.useBrisk() == true) fileManager.writeTimeToJson(pVec[i] + "_brisk_matchTime", "matchTimer", tMBrisk[i]);
-		if (controller.useFreak() == true) fileManager.writeTimeToJson(pVec[i] + "_freak_matchTime", "matchTimer", tMFreak[i]);
-		if (controller.useOrb() == true) fileManager.writeTimeToJson(pVec[i] + "_orb_matchTime", "matchTimer", tMOrb[i]);
+		cout << "crosscheck for " << pVec[i] << " ..." << endl;
+		if (controller.useSift() == true) {
+			time = clock();
+			crossVecSift.push_back(keypointMatcher.crosscheckMatcher(NORM_L2, dVecSift1[i], dVecSift2[i]));
+			tCrossSift.push_back(clock() - time);
+		}
+		if (controller.useSurf() == true) {
+			time = clock();
+			crossVecSurf.push_back(keypointMatcher.crosscheckMatcher(NORM_L2, dVecSurf1[i], dVecSurf2[i]));
+			tCrossSurf.push_back(clock() - time);
+		}
+		if (controller.useBrisk() == true) {
+			time = clock();
+			crossVecBrisk.push_back(keypointMatcher.crosscheckMatcher(NORM_HAMMING, dVecBrisk1[i], dVecBrisk2[i]));
+			tCrossBrisk.push_back(clock() - time);
+		}
+		if (controller.useFreak() == true) {
+			time = clock();
+			crossVecFreak.push_back(keypointMatcher.crosscheckMatcher(NORM_HAMMING, dVecFreak1[i], dVecFreak2[i]));
+			tCrossFreak.push_back(clock() - time);
+		}
+		if (controller.useOrb() == true) {
+			time = clock();
+			crossVecOrb.push_back(keypointMatcher.crosscheckMatcher(NORM_HAMMING, dVecOrb1[i], dVecOrb2[i]));
+			tCrossOrb.push_back(clock() - time);
+		}
 	}
 	cout << " > done" << endl;
 
-	// write number of bfmMatches to json
+	// #################### filter crosscheck-matches from ratio-matches ####################
+
 	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "write bfmMatches to json " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) fileManager.writeMatchesToJson(pVec[i] + "_sift_matches", "bfmMatches", matchVecSift[i]);
-		if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i] + "_surf_matches", "bfmMatches", matchVecSurf[i]);
-		if (controller.useBrisk() == true) fileManager.writeMatchesToJson(pVec[i] + "_brisk_matches", "bfmMatches", matchVecBrisk[i]);
-		if (controller.useFreak() == true) fileManager.writeMatchesToJson(pVec[i] + "_freak_matches", "bfmMatches", matchVecFreak[i]);
-		if (controller.useOrb() == true) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", "bfmMatches", matchVecOrb[i]);
+		cout << "crosscheck for " << pVec[i] << " ..." << endl;
+		if (controller.useSift() == true) keypointMatcher.filterMatchesByMatches(matchVecSift[i], crossVecSift[i]);
+		if (controller.useSurf() == true) keypointMatcher.filterMatchesByMatches(matchVecSurf[i], crossVecSurf[i]);
+		if (controller.useBrisk() == true) keypointMatcher.filterMatchesByMatches(matchVecBrisk[i], crossVecBrisk[i]);
+		if (controller.useFreak() == true) keypointMatcher.filterMatchesByMatches(matchVecFreak[i], crossVecFreak[i]);
+		if (controller.useOrb() == true) keypointMatcher.filterMatchesByMatches(matchVecOrb[i], crossVecOrb[i]);
+	}
+	cout << " > done" << endl;
+
+	// write crosscheckMatchTimes to json
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "write crosscheckMatchTimes to json " << pVec[i] << " ..." << endl;
+		if (controller.useSift() == true) fileManager.writeTimeToJson(pVec[i] + "_sift_matchTime", "crosscheckMatchTimer", tCrossSift[i]);
+		if (controller.useSurf() == true) fileManager.writeTimeToJson(pVec[i] + "_surf_matchTime", "crosscheckMatchTimer", tCrossSurf[i]);
+		if (controller.useBrisk() == true) fileManager.writeTimeToJson(pVec[i] + "_brisk_matchTime", "crosscheckMatchTimer", tCrossBrisk[i]);
+		if (controller.useFreak() == true) fileManager.writeTimeToJson(pVec[i] + "_freak_matchTime", "crosscheckMatchTimer", tCrossFreak[i]);
+		if (controller.useOrb() == true) fileManager.writeTimeToJson(pVec[i] + "_orb_matchTime", "crosscheckMatchTimer", tCrossOrb[i]);
+	}
+	cout << " > done" << endl;
+
+	// write ratioMatchTimes to json
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "write ratioMatchTimes to json " << pVec[i] << " ..." << endl;
+		if (controller.useSift() == true) fileManager.writeTimeToJson(pVec[i] + "_sift_matchTime", "ratioMatchTimer", tRatioSift[i]);
+		if (controller.useSurf() == true) fileManager.writeTimeToJson(pVec[i] + "_surf_matchTime", "ratioMatchTimer", tRatioSurf[i]);
+		if (controller.useBrisk() == true) fileManager.writeTimeToJson(pVec[i] + "_brisk_matchTime", "ratioMatchTimer", tRatioBrisk[i]);
+		if (controller.useFreak() == true) fileManager.writeTimeToJson(pVec[i] + "_freak_matchTime", "ratioMatchTimer", tRatioFreak[i]);
+		if (controller.useOrb() == true) fileManager.writeTimeToJson(pVec[i] + "_orb_matchTime", "ratioMatchTimer", tRatioOrb[i]);
+	}
+	cout << " > done" << endl;
+
+	// write number of crosscheckMatches to json
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "write crosscheckMatches to json " << pVec[i] << " ..." << endl;
+		if (controller.useSift() == true) fileManager.writeMatchesToJson(pVec[i] + "_sift_matches", "crosscheckMatches", crossVecSift[i]);
+		if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i] + "_surf_matches", "crosscheckMatches", crossVecSurf[i]);
+		if (controller.useBrisk() == true) fileManager.writeMatchesToJson(pVec[i] + "_brisk_matches", "crosscheckMatches", crossVecBrisk[i]);
+		if (controller.useFreak() == true) fileManager.writeMatchesToJson(pVec[i] + "_freak_matches", "crosscheckMatches", crossVecFreak[i]);
+		if (controller.useOrb() == true) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", "crosscheckMatches", crossVecOrb[i]);
+	}
+	cout << " > done" << endl;
+
+	// write number of ratioMatches to json
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "write ratioMatches to json " << pVec[i] << " ..." << endl;
+		if (controller.useSift() == true) fileManager.writeMatchesToJson(pVec[i] + "_sift_matches", "ratioMatches", matchVecSift[i]);
+		if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i] + "_surf_matches", "ratioMatches", matchVecSurf[i]);
+		if (controller.useBrisk() == true) fileManager.writeMatchesToJson(pVec[i] + "_brisk_matches", "ratioMatches", matchVecBrisk[i]);
+		if (controller.useFreak() == true) fileManager.writeMatchesToJson(pVec[i] + "_freak_matches", "ratioMatches", matchVecFreak[i]);
+		if (controller.useOrb() == true) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", "ratioMatches", matchVecOrb[i]);
 	}
 	cout << " > done" << endl;
 
@@ -252,11 +320,11 @@ int main(int argc, char** argv) {
 	// write number of filtered matches to json
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "write filteredMatches to json " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) fileManager.writeMatchesToJson(pVec[i] + "_sift_matches", "filteredMatches", matchVecSift[i]);
-		if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i] + "_surf_matches", "filteredMatches", matchVecSurf[i]);
-		if (controller.useBrisk() == true) fileManager.writeMatchesToJson(pVec[i] + "_brisk_matches", "filteredMatches", matchVecBrisk[i]);
-		if (controller.useFreak() == true) fileManager.writeMatchesToJson(pVec[i] + "_freak_matches", "filteredMatches", matchVecFreak[i]);
-		if (controller.useOrb() == true) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", "filteredMatches", matchVecOrb[i]);
+		if (controller.useSift() == true) fileManager.writeMatchesToJson(pVec[i] + "_sift_matches", "thresholdMatches", matchVecSift[i]);
+		if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i] + "_surf_matches", "thresholdMatches", matchVecSurf[i]);
+		if (controller.useBrisk() == true) fileManager.writeMatchesToJson(pVec[i] + "_brisk_matches", "thresholdMatches", matchVecBrisk[i]);
+		if (controller.useFreak() == true) fileManager.writeMatchesToJson(pVec[i] + "_freak_matches", "thresholdMatches", matchVecFreak[i]);
+		if (controller.useOrb() == true) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", "thresholdMatches", matchVecOrb[i]);
 	}
 	cout << " > done" << endl;
 
@@ -276,7 +344,7 @@ int main(int argc, char** argv) {
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "write ransacInliers to json " << pVec[i] << " ..." << endl;
 		if (controller.useSift() == true) fileManager.writeMatchesToJson(pVec[i] + "_sift_matches", "ransacInliers", matchVecSift[i]);
-		if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i]+"_surf_matches", "ransacInliers", matchVecSurf[i]);
+		if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i] + "_surf_matches", "ransacInliers", matchVecSurf[i]);
 		if (controller.useBrisk() == true) fileManager.writeMatchesToJson(pVec[i] + "_brisk_matches", "ransacInliers", matchVecBrisk[i]);
 		if (controller.useFreak() == true) fileManager.writeMatchesToJson(pVec[i] + "_freak_matches", "ransacInliers", matchVecFreak[i]);
 		if (controller.useOrb() == true) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", "ransacInliers", matchVecOrb[i]);
@@ -316,11 +384,11 @@ int main(int argc, char** argv) {
 	if (totalMatchesFreak > 0) avgDistFreak = avgDistFreak / totalMatchesFreak;
 	if (totalMatchesOrb > 0) avgDistOrb = avgDistOrb / totalMatchesOrb;
 
-	//avgDistSift = (round(avgDistSift * 10000)) / 10000;
-	//avgDistSurf = (round(avgDistSurf * 10000)) / 10000;
-	//avgDistBrisk = (round(avgDistBrisk * 10000)) / 10000;
-	//avgDistFreak = (round(avgDistFreak * 10000)) / 10000;
-	//avgDistOrb = (round(avgDistOrb * 10000)) / 10000;
+	/*avgDistSurf = (float)((int)(avgDistSift * 1000)) / 1000;
+	avgDistSurf = (float)((int)(avgDistSurf * 1000)) / 1000;
+	avgDistBrisk = (float)((int)(avgDistBrisk * 1000)) / 1000;
+	avgDistFreak = (float)((int)(avgDistFreak * 1000)) / 1000;
+	avgDistOrb = (float)((int)(avgDistOrb * 1000)) / 1000;*/
 
 	cout << " > done" << endl;
 
@@ -355,11 +423,11 @@ int main(int argc, char** argv) {
 	//cout << " > done" << endl;
 
 
-	
+
 	//Test test;
 	//test.test(img1, img2, "Good Matches & Object detection");
 
-	
+
 	//keypointDescription.orb(img, img2, H);
 	//keypointDescription.brisk(img, img2);
 	//keypointDescription.sift(img, img2);
@@ -369,7 +437,7 @@ int main(int argc, char** argv) {
 
 	//vector<KeyPoint> keypoints;
 	//fileManager.writeKeypointsToJson("detektor2", keypoints);
-	
+
 	img1 = img.clone();
 
 	imshow("bgr", img1);
@@ -378,8 +446,10 @@ int main(int argc, char** argv) {
 	//cout << img.col(0).row(0) << endl;
 	//imshow("gray", img);
 	//waitKey(0);
-	cvtColor(img1, img, CV_BGR2Luv);
-	imshow("luv1", img);
+	//cvtColor(img1, img, CV_BGR2Luv);
+	//img1 = preProcessing.bm3d(img1);
+	img1 = preProcessing.weightedGray(img1);
+	imshow("bm3d", img1);
 	waitKey(0);
 	//cvtColor(img, img, CV_BGR2GRAY);
 	//cout << img.at<float>(0, 0);
@@ -401,7 +471,7 @@ int main(int argc, char** argv) {
 	//imshow("ycbcr", planes2[0]);
 	//waitKey(0);
 
-   return 0;
-} 
+	return 0;
+}
 
 

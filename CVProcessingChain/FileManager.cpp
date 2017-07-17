@@ -150,28 +150,34 @@ void FileManager::createEmptyJson(string path) {
 	Document::AllocatorType& allocator = doc.GetAllocator();
 
 	Value kpObj(kObjectType);
-	Value mBFMObj(kObjectType);
-	Value mFilterObj(kObjectType);
+	Value ratioBFMObj(kObjectType);
+	Value crosscheckBFMObj(kObjectType);
+	Value threshMObj(kObjectType);
 	Value ransacInlierObj(kObjectType);
 	Value realMObj(kObjectType);
 
 	Value avgDistHom(kObjectType);
 
+	Value preprocessingTimerObj(kObjectType);
 	Value detectorTimerObj(kObjectType);
 	Value descriptorTimerObj(kObjectType);
-	Value mTimerObj(kObjectType);
+	Value ratioMatchTimerObj(kObjectType);
+	Value crosscheckMatchTimerObj(kObjectType);
 
 	doc.AddMember("keypoints", kpObj, allocator);
-	doc.AddMember("bfmMatches", mBFMObj, allocator);
-	doc.AddMember("filteredMatches", mFilterObj, allocator);
+	doc.AddMember("crosscheckMatches", crosscheckBFMObj, allocator);
+	doc.AddMember("ratioMatches", ratioBFMObj, allocator);
+	doc.AddMember("thresholdMatches", threshMObj, allocator);
 	doc.AddMember("ransacInliers", ransacInlierObj, allocator);
 	doc.AddMember("realMatches", realMObj, allocator);
 
 	doc.AddMember("avgDistHomography", avgDistHom, allocator);
 
+	doc.AddMember("preprocessingTimer", preprocessingTimerObj, allocator);
 	doc.AddMember("detectorTimer", detectorTimerObj, allocator);
 	doc.AddMember("descriptorTimer", descriptorTimerObj, allocator);
-	doc.AddMember("matchTimer", mTimerObj, allocator);
+	doc.AddMember("ratioMatchTimer", ratioMatchTimerObj, allocator);
+	doc.AddMember("crosscheckMatchTimer", crosscheckMatchTimerObj, allocator);
 
 	writeJsonFromDocument(::fileName, doc);
 }

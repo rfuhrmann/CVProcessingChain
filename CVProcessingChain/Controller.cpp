@@ -21,23 +21,24 @@ bool gray = true; //rgb color space for greyscale conversion
 bool weightedGray = false; //rgb color space for weighted greyscale conversion
 bool yCrCb = false; //YCrCb color space for greyscale conversion
 bool luv = false; //Luv color space for greyscale conversion
-bool histEqual = false; //histogram equalization, global contrast enhancement
+
+bool histEqual = true; //histogram equalization, global contrast enhancement
 bool clahe = false; //clahe filter, Contrast Limited Adaptive Histogram Equalization
 bool bilateral = false; //bilateral filter, blurring
 bool nlm = false; //non local mean filter, blurring
-
-//verschiedene methoden zur grauwert umwandlung
+bool bm3d = false; //block matching and 3d filtering
+//deconvolution incl. noise estimation
 
 bool sift = true; //Scale-invariant feature transform
-bool surf = false; //Speeded Up Robust Features
-bool brisk = false; //Binary Robust Invariant Scalable Keypoints
+bool surf = true; //Speeded Up Robust Features
+bool brisk = true; //Binary Robust Invariant Scalable Keypoints
 bool freak = true; //Fast REtinA Keypoint - Descriptor only, uses fast detector
-bool orb = false; //Oriented FAST and Rotated BRIEF
+bool orb = true; //Oriented FAST and Rotated BRIEF
 
-//threshold for max distance of a match fo rthresholdFilter (distance of keypoints)
+//threshold for max distance of a match for thresholdFilter (distance of keypoints)
 int threshMatches = 1000;
 //threshold for max distance of a match for homographyFilter (distance of deskriptor points)
-int threshHomography = 10;
+int threshHomography = 20;
 
 Controller::Controller()
 {
@@ -51,6 +52,7 @@ Controller::Controller()
 	if (clahe) preProcessors.push_back("clahe");
 	if (nlm) preProcessors.push_back("nlm");
 	if (bilateral) preProcessors.push_back("bilateral");
+	if (bm3d) preProcessors.push_back("bm3d");
 
 	keypointDetectors.clear();
 	if (sift) keypointDetectors.push_back("sift");
@@ -63,7 +65,6 @@ Controller::Controller()
 	for (auto itP = preProcessors.cbegin(); itP != preProcessors.cend(); ++itP) {
 		for (auto itK = keypointDetectors.cbegin(); itK != keypointDetectors.cend(); ++itK) {
 			keypointFiles.push_back(*itP+"_"+*itK+".dat");
-			//cout << *itP + "_" + *itK + ".dat" << endl;
 		}
 	}
 }
@@ -100,6 +101,9 @@ bool Controller::useNlm() {
 }
 bool Controller::useBilateral() {
 	return bilateral;
+}
+bool Controller::useBM3D () {
+	return bm3d;
 }
 
 vector<string> Controller::getKeypointDetectors() {
