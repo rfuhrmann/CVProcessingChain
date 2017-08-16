@@ -117,8 +117,6 @@ void KeypointMatcher::ransacFilter(vector<KeyPoint>& keypointsObject, vector<Key
 // filter matches by known homography
 float KeypointMatcher::homographyFilter(int thresh, vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H) {
 
-	cout << "HOMOGRAPHYFILTER" << endl;
-
 	//if keypoints empty -> erase all matches and return
 	if (keypoints1.empty()) {
 		matches.clear();
@@ -127,7 +125,6 @@ float KeypointMatcher::homographyFilter(int thresh, vector<KeyPoint>& keypoints1
 	//if matches empty -> return
 	if (matches.empty()) return -1;
 
-	//int tolerance = 10;
 	vector<Point3f> v1, v2;
 
 	for (int i = 0; i < matches.size(); ++i) {
@@ -136,21 +133,21 @@ float KeypointMatcher::homographyFilter(int thresh, vector<KeyPoint>& keypoints1
 	}
 	// determine the correct point in v2
 	transform(v1, v1, H);
-
+	
 	//avg distance
 	float dX, dY, dXY, dTotal = 0;
-
+	
 	// check if correct points in v1 correlate to matched points in v2 -> erase if they don`t
 	for (int i = matches.size() - 1; i >= 0; --i) {
 		dX = abs(v1[i].x - v2[i].x);
 		dY = abs(v1[i].y - v2[i].y);
 		dXY = sqrt(dX*dX + dY*dY);
-		cout << dXY << endl;
+		//cout << dXY << endl;
 		if (dXY > thresh) {
 			matches.erase(matches.begin() + i);
 		}
 		else {
-			dTotal += sqrt(dX*dX + dY*dY);
+			dTotal += dXY;
 		}
 	}
 	return dTotal;

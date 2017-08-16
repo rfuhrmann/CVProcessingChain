@@ -25,17 +25,30 @@ void Test::test(Mat& img1, Mat& img2, string wName)
 	img_object.convertTo(img_object, CV_8UC1);
 	img_scene.convertTo(img_scene, CV_8UC1);
 
+	////-- Step 1: Detect the keypoints using SURF Detector
+	//int minHessian = 400;
+	////SurfFeatureDetector detector(minHessian);
+	//Ptr<SURF> detector = SURF::create(minHessian);
+	//vector<KeyPoint> keypoints_object, keypoints_scene;
+
+	//detector->detect(img_object, keypoints_object);
+	//detector->detect(img_scene, keypoints_scene);
+
+	////-- Step 2: Calculate descriptors (feature vectors)
+	//Ptr<SURF> extractor = SURF::create();
+	//Mat descriptors_object, descriptors_scene;
+
 	//-- Step 1: Detect the keypoints using SURF Detector
-	int minHessian = 400;
+	int minHessian = 20;
 	//SurfFeatureDetector detector(minHessian);
-	Ptr<SURF> detector = SURF::create(minHessian);
+	Ptr<SIFT> detector = SIFT::create(minHessian);
 	vector<KeyPoint> keypoints_object, keypoints_scene;
 
 	detector->detect(img_object, keypoints_object);
 	detector->detect(img_scene, keypoints_scene);
 
 	//-- Step 2: Calculate descriptors (feature vectors)
-	Ptr<SURF> extractor = SURF::create();
+	Ptr<SIFT> extractor = SIFT::create();
 	Mat descriptors_object, descriptors_scene;
 
 	extractor->compute(img_object, keypoints_object, descriptors_object);
@@ -71,20 +84,20 @@ void Test::test(Mat& img1, Mat& img2, string wName)
 		}
 	}
 	if (good_matches.size() < 1) {
-		cout << "##no good matches"<< endl;
+		cout << "##no good matches" << endl;
 		cout << "##return..." << endl;
-		return; 
+		return;
 	}
 	else {
-		cout << wName+"_matches: " << matches.size() << endl;
-		cout << wName+"_good_matches: "<< good_matches.size() << endl;
+		cout << wName + "_matches: " << matches.size() << endl;
+		cout << wName + "_good_matches: " << good_matches.size() << endl;
 	}
 
 	Mat img_matches;
 	drawMatches(img_object, keypoints_object, img_scene, keypoints_scene,
 		good_matches, img_matches, Scalar::all(-1), Scalar::all(-1));
 	//,	vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS
-	
+
 	//-- Localize the object
 	vector<Point2f> obj;
 	vector<Point2f> scene;
@@ -114,12 +127,12 @@ void Test::test(Mat& img1, Mat& img2, string wName)
 	line(img_matches, scene_corners[2] + Point2f(img_object.cols, 0), scene_corners[3] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
 	line(img_matches, scene_corners[3] + Point2f(img_object.cols, 0), scene_corners[0] + Point2f(img_object.cols, 0), Scalar(0, 255, 0), 4);
 
-	
+
 	//-- Show detected matches
 	//"Good Matches & Object detection"
-	imshow("test_surf_"+wName, img_matches);
-	
-	//waitKey(0);
+	imshow("test_surf_" + wName, img_matches);
+
+	waitKey(0);
 	return;
 }
 
@@ -169,11 +182,11 @@ int main(int argc, const char *argv[])
   double max_dist = 0; double min_dist = 100;
   for( int i = 0; i < descriptors1.rows; i++)
   {
-      double dist = matches12[i].data()->distance;
-      if(dist < min_dist)
-         min_dist = dist;
-      if(dist > max_dist)
-         max_dist = dist;
+	  double dist = matches12[i].data()->distance;
+	  if(dist < min_dist)
+		 min_dist = dist;
+	  if(dist > max_dist)
+		 max_dist = dist;
   }
   printf("-- Max dist : %f \n", max_dist);
   printf("-- Min dist : %f \n", min_dist);
@@ -183,14 +196,14 @@ int main(int argc, const char *argv[])
   std::vector<DMatch> good_matches1, good_matches2;
   for(int i=0; i < matches12.size(); i++)
   {
-      if(matches12[i][0].distance < ratio * matches12[i][1].distance)
-         good_matches1.push_back(matches12[i][0]);
+	  if(matches12[i][0].distance < ratio * matches12[i][1].distance)
+		 good_matches1.push_back(matches12[i][0]);
   }
 
   for(int i=0; i < matches21.size(); i++)
   {
-      if(matches21[i][0].distance < ratio * matches21[i][1].distance)
-         good_matches2.push_back(matches21[i][0]);
+	  if(matches21[i][0].distance < ratio * matches21[i][1].distance)
+		 good_matches2.push_back(matches21[i][0]);
   }
 
   cout << "Good matches1:" << good_matches1.size() << endl;
@@ -200,14 +213,14 @@ int main(int argc, const char *argv[])
  std::vector<DMatch> better_matches;
  for(int i=0; i<good_matches1.size(); i++)
  {
-     for(int j=0; j<good_matches2.size(); j++)
-     {
-         if(good_matches1[i].queryIdx == good_matches2[j].trainIdx && good_matches2[j].queryIdx == good_matches1[i].trainIdx)
-         {
-             better_matches.push_back(DMatch(good_matches1[i].queryIdx, good_matches1[i].trainIdx, good_matches1[i].distance));
-        break;
-         }
-     }
+	 for(int j=0; j<good_matches2.size(); j++)
+	 {
+		 if(good_matches1[i].queryIdx == good_matches2[j].trainIdx && good_matches2[j].queryIdx == good_matches1[i].trainIdx)
+		 {
+			 better_matches.push_back(DMatch(good_matches1[i].queryIdx, good_matches1[i].trainIdx, good_matches1[i].distance));
+		break;
+		 }
+	 }
  }
 
  cout << "Better matches:" << better_matches.size() << endl;

@@ -25,6 +25,8 @@ public:
 	bool useWeightedGray(void);
 	bool useYCrCb(void);
 	bool useLuv(void);
+	bool useLab(void);
+
 	bool useHistEqual(void);
 	bool useClahe(void);
 	bool useNlm(void);

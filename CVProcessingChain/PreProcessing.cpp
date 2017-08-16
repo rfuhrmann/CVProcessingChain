@@ -9,6 +9,7 @@
 #include "PreProcessing.h"
 #include <opencv2/opencv.hpp>
 #include <opencv2/xphoto/bm3d_image_denoising.hpp>
+#include <opencv2/videostab/deblurring.hpp>
 
 
 //The conventional ranges for R, G, and B channel values are :
@@ -73,6 +74,20 @@ Mat PreProcessing::luv(Mat& img) {
 	split(img2, planes);
 	return planes[0];
 }
+
+// grayscale conversion from Lab color space
+/*
+img         :  input image
+return      :  the result image
+*/
+Mat PreProcessing::lab(Mat& img) {
+	Mat img2;
+	vector<Mat> planes;
+	cvtColor(img, img2, COLOR_BGR2Lab);
+	split(img2, planes);
+	return planes[0];
+}
+
 // histogram equalization for global contrat enhancement
 /*
 img         :  input image
@@ -95,9 +110,11 @@ Mat PreProcessing::clahe(Mat& img) {
 	Mat img2;// = weightedGray(img);
 	//img2.convertTo(img2, CV_8UC1);
 
-	Ptr<CLAHE> clahe = createCLAHE();
-	clahe->setClipLimit(8);
+	Ptr<CLAHE> clahe = createCLAHE(30, Size(16, 16));
+	//clahe->setClipLimit(8);
 	clahe->apply(img, img2);
+	//imshow("clahe", img2);
+	//waitKey(0);
 	return img2;
 }
 
@@ -120,7 +137,7 @@ return      :  the blurred image
 */
 Mat PreProcessing::nlmDenoising(Mat& img) {
 	Mat img2;// = weightedGray(img);
-	fastNlMeansDenoising(img, img2, 3, 7, 5); //prefered: 3,7,21
+	fastNlMeansDenoising(img, img2, 3, 7, 21); //prefered: 3,7,21
 	return img2;
 }
 
@@ -132,6 +149,18 @@ return      :  the denoised image
 Mat PreProcessing::bm3d(Mat& img) {
 	Mat img2;// = weightedGray(img);
 	xphoto::bm3dDenoising(img, img2, 1.0, 4, 16, 2500, 400, 8, 1, 2.0, 4, 0, 0);
+	return img2;
+}
+
+// blind deblurring
+/*
+img         :  input image
+return      :  the denoised image
+*/
+Mat PreProcessing::deblur(Mat& img) {
+	cout << "deblur..." << endl;
+	Mat img2 = img.clone();
+	videostab::WeightingDeblurer().deblur(1, img2);
 	return img2;
 }
 

@@ -28,12 +28,14 @@ class PreProcessing{
 	  Mat weightedGray(Mat&);
 	  Mat yCrCb(Mat&);
 	  Mat luv(Mat&);
+	  Mat lab(Mat&);
 
 	  Mat histogramEqualisation(Mat&);//contrast enhancement global
 	  Mat clahe(Mat&);//contrast enhancement lokal
 	  Mat nlmDenoising(Mat&);//denoising
 	  Mat bilateralFiltering(Mat&);//blur
 	  Mat bm3d(Mat&);//denoising
+	  Mat deblur(Mat&);//deblurring
 
 	  //convert image to 
 	  

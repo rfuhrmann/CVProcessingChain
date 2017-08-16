@@ -157,6 +157,7 @@ void FileManager::createEmptyJson(string path) {
 	Value realMObj(kObjectType);
 
 	Value avgDistHom(kObjectType);
+	Value totalDistHom(kObjectType);
 
 	Value preprocessingTimerObj(kObjectType);
 	Value detectorTimerObj(kObjectType);
@@ -172,6 +173,7 @@ void FileManager::createEmptyJson(string path) {
 	doc.AddMember("realMatches", realMObj, allocator);
 
 	doc.AddMember("avgDistHomography", avgDistHom, allocator);
+	doc.AddMember("totalDistHomography", totalDistHom, allocator);
 
 	doc.AddMember("preprocessingTimer", preprocessingTimerObj, allocator);
 	doc.AddMember("detectorTimer", detectorTimerObj, allocator);

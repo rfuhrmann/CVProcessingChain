@@ -30,14 +30,12 @@ return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
+	//img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
-	int minHessian = 400;
-	Ptr<SIFT> detector = SIFT::create(minHessian);
+	//int minHessian = 400;
+	Ptr<SIFT> detector = SIFT::create(500);
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
-	//cout << "SIZESIZE " << keypoints.at(0).size() << endl;
-
 	//-- Show detected (drawn) keypoints
 	if (showImage) {
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
@@ -54,10 +52,10 @@ return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
+	//img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
-	int minHessian = 400;
-	Ptr<SURF> detector = SURF::create(minHessian);
+	//int minHessian = 400;
+	Ptr<SURF> detector = SURF::create(500);
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 	
@@ -77,11 +75,12 @@ return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
+	//img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
 	vector<KeyPoint> keypoints;
+	//FAST(img2, keypoints, 40, true);
 	FAST(img2, keypoints, 40, true);
-
+	
 	//-- Show detected (drawn) keypoints
 	if (showImage) {
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
@@ -99,7 +98,7 @@ return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
+	//img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
 	Ptr<BRISK> detector = BRISK::create();
 	vector<KeyPoint> keypoints;
@@ -122,9 +121,9 @@ return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	img2.convertTo(img2, CV_8UC1);
+	//img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
-	Ptr<ORB> detector = ORB::create();
+	Ptr<ORB> detector = ORB::create(4434);
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 

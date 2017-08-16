@@ -90,7 +90,7 @@ int main(int argc, char** argv) {
 	// building a vector of keypoints for each image in iList
 	vector<vector<KeyPoint>> kVecSift1, kVecSurf1, kVecBrisk1, kVecFreak1, kVecOrb1;
 	vector<vector<KeyPoint>> kVecSift2, kVecSurf2, kVecBrisk2, kVecFreak2, kVecOrb2;
-	vector<vector<vector<KeyPoint>>> helperKeypoints{ kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2 };
+	vector<vector<vector<KeyPoint>>> helperKeypoints{kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2};
 	DetectionHelper detectionHelper;
 	detectionHelper.runDetection(pVec, iVec1, iVec2, kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2);
 
@@ -249,9 +249,8 @@ int main(int argc, char** argv) {
 	cout << " > done" << endl;
 
 	// #################### filter crosscheck-matches from ratio-matches ####################
-
 	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "crosscheck for " << pVec[i] << " ..." << endl;
+		cout << "filter ratio-matches for " << pVec[i] << " ..." << endl;
 		if (controller.useSift() == true) keypointMatcher.filterMatchesByMatches(matchVecSift[i], crossVecSift[i]);
 		if (controller.useSurf() == true) keypointMatcher.filterMatchesByMatches(matchVecSurf[i], crossVecSurf[i]);
 		if (controller.useBrisk() == true) keypointMatcher.filterMatchesByMatches(matchVecBrisk[i], crossVecBrisk[i]);
@@ -274,11 +273,11 @@ int main(int argc, char** argv) {
 	// write ratioMatchTimes to json
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "write ratioMatchTimes to json " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) fileManager.writeTimeToJson(pVec[i] + "_sift_matchTime", "ratioMatchTimer", tRatioSift[i]);
-		if (controller.useSurf() == true) fileManager.writeTimeToJson(pVec[i] + "_surf_matchTime", "ratioMatchTimer", tRatioSurf[i]);
-		if (controller.useBrisk() == true) fileManager.writeTimeToJson(pVec[i] + "_brisk_matchTime", "ratioMatchTimer", tRatioBrisk[i]);
-		if (controller.useFreak() == true) fileManager.writeTimeToJson(pVec[i] + "_freak_matchTime", "ratioMatchTimer", tRatioFreak[i]);
-		if (controller.useOrb() == true) fileManager.writeTimeToJson(pVec[i] + "_orb_matchTime", "ratioMatchTimer", tRatioOrb[i]);
+		if (controller.useSift() == true && !tRatioSift.empty()) fileManager.writeTimeToJson(pVec[i] + "_sift_matchTime", "ratioMatchTimer", tRatioSift[i]);
+		if (controller.useSurf() == true && !tRatioSurf.empty()) fileManager.writeTimeToJson(pVec[i] + "_surf_matchTime", "ratioMatchTimer", tRatioSurf[i]);
+		if (controller.useBrisk() == true && !tRatioBrisk.empty()) fileManager.writeTimeToJson(pVec[i] + "_brisk_matchTime", "ratioMatchTimer", tRatioBrisk[i]);
+		if (controller.useFreak() == true && !tRatioFreak.empty()) fileManager.writeTimeToJson(pVec[i] + "_freak_matchTime", "ratioMatchTimer", tRatioFreak[i]);
+		if (controller.useOrb() == true && !tRatioOrb.empty()) fileManager.writeTimeToJson(pVec[i] + "_orb_matchTime", "ratioMatchTimer", tRatioOrb[i]);
 	}
 	cout << " > done" << endl;
 
@@ -353,36 +352,57 @@ int main(int argc, char** argv) {
 
 	// #################### filter by real matches ####################
 	// filter matches by known homography
-	float avgDistSift = 0, avgDistSurf = 0, avgDistBrisk = 0, avgDistFreak = 0, avgDistOrb = 0;
+	vector<float> avgDistSift, avgDistSurf, avgDistBrisk, avgDistFreak, avgDistOrb;
+	float totalDistSift = 0, totalDistSurf = 0, totalDistBrisk = 0, totalDistFreak = 0, totalDistOrb = 0;
 	int totalMatchesSift = 0, totalMatchesSurf = 0, totalMatchesBrisk = 0, totalMatchesFreak = 0, totalMatchesOrb = 0;
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "filter matches by known homography for " << pVec[i] << " ..." << endl;
 		if (controller.useSift() == true) {
-			avgDistSift += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSift1[i], kVecSift2[i], matchVecSift[i], H);
+			avgDistSift.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSift1[i], kVecSift2[i], matchVecSift[i], H));
+			totalDistSift += avgDistSift.back();
 			totalMatchesSift += matchVecSift[i].size();
+			if (matchVecSift[i].size() > 0) avgDistSift.back() = avgDistSift.back() / matchVecSift[i].size();
 		}
 		if (controller.useSurf() == true) {
-			avgDistSurf += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSurf1[i], kVecSurf2[i], matchVecSurf[i], H);
+			//totalDistSurf += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSurf1[i], kVecSurf2[i], matchVecSurf[i], H);
+			//totalMatchesSurf += matchVecSurf[i].size();
+			avgDistSurf.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSurf1[i], kVecSurf2[i], matchVecSurf[i], H));
+			totalDistSurf += avgDistSurf.back();
 			totalMatchesSurf += matchVecSurf[i].size();
+			if (matchVecSurf[i].size() > 0) avgDistSurf.back() = avgDistSurf.back() / matchVecSurf[i].size();
 		}
 		if (controller.useBrisk() == true) {
-			avgDistBrisk += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i], H);
+			//totalDistBrisk += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i], H);
+			//totalMatchesBrisk += matchVecBrisk[i].size();
+			avgDistBrisk.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i], H));
+			totalDistBrisk += avgDistBrisk.back();
 			totalMatchesBrisk += matchVecBrisk[i].size();
+			if (matchVecBrisk[i].size() > 0) avgDistBrisk.back() = avgDistBrisk.back() / matchVecBrisk[i].size();
 		}
 		if (controller.useFreak() == true) {
-			avgDistFreak += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecFreak1[i], kVecFreak2[i], matchVecFreak[i], H);
+			//totalDistFreak += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecFreak1[i], kVecFreak2[i], matchVecFreak[i], H);
+			//totalMatchesFreak += matchVecFreak[i].size();
+			avgDistFreak.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecFreak1[i], kVecFreak2[i], matchVecFreak[i], H));
+			totalDistFreak += avgDistFreak.back();
 			totalMatchesFreak += matchVecFreak[i].size();
+			if (matchVecFreak[i].size() > 0) avgDistFreak.back() = avgDistFreak.back() / matchVecFreak[i].size();
 		}
 		if (controller.useOrb() == true) {
-			avgDistOrb += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecOrb1[i], kVecOrb2[i], matchVecOrb[i], H);
+			//totalDistOrb += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecOrb1[i], kVecOrb2[i], matchVecOrb[i], H);
+			//totalMatchesOrb += matchVecOrb[i].size();
+			avgDistOrb.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecOrb1[i], kVecOrb2[i], matchVecOrb[i], H));
+			totalDistOrb += avgDistOrb.back();
 			totalMatchesOrb += matchVecOrb[i].size();
+			if (matchVecOrb[i].size() > 0) avgDistOrb.back() = avgDistOrb.back() / matchVecOrb[i].size();
 		}
 	}
-	if (totalMatchesSift > 0) avgDistSift = avgDistSift / totalMatchesSift;
-	if (totalMatchesSurf > 0) avgDistSurf = avgDistSurf / totalMatchesSurf;
-	if (totalMatchesBrisk > 0) avgDistBrisk = avgDistBrisk / totalMatchesBrisk;
-	if (totalMatchesFreak > 0) avgDistFreak = avgDistFreak / totalMatchesFreak;
-	if (totalMatchesOrb > 0) avgDistOrb = avgDistOrb / totalMatchesOrb;
+	
+	// calculate distance for all values of one detector
+	if (totalMatchesSift > 0) totalDistSift = totalDistSift / totalMatchesSift;
+	if (totalMatchesSurf > 0) totalDistSurf = totalDistSurf / totalMatchesSurf;
+	if (totalMatchesBrisk > 0) totalDistBrisk = totalDistBrisk / totalMatchesBrisk;
+	if (totalMatchesFreak > 0) totalDistFreak = totalDistFreak / totalMatchesFreak;
+	if (totalMatchesOrb > 0) totalDistOrb = totalDistOrb / totalMatchesOrb;
 
 	/*avgDistSurf = (float)((int)(avgDistSift * 1000)) / 1000;
 	avgDistSurf = (float)((int)(avgDistSurf * 1000)) / 1000;
@@ -404,12 +424,23 @@ int main(int argc, char** argv) {
 	cout << " > done" << endl;
 
 	// write avgDistHomography to json
-	cout << "write avgDistHomography to json " << " ..." << endl;
-	if (controller.useSift() == true) fileManager.writeDistanceToJson("sift_avgDistHom", "avgDistHomography", avgDistSift);
-	if (controller.useSurf() == true) fileManager.writeDistanceToJson("surf_avgDistHom", "avgDistHomography", avgDistSurf);
-	if (controller.useBrisk() == true) fileManager.writeDistanceToJson("brisk_avgDistHom", "avgDistHomography", avgDistBrisk);
-	if (controller.useFreak() == true) fileManager.writeDistanceToJson("freak_avgDistHom", "avgDistHomography", avgDistFreak);
-	if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_avgDistHom", "avgDistHomography", avgDistOrb);
+	for (int i = 0; i < pVec.size(); ++i) {
+		cout << "write avgDistHomography to json " << pVec[i] << " ..." << endl;
+		if (controller.useSift() == true) fileManager.writeDistanceToJson(pVec[i] + "_sift_avgDistHom", "avgDistHomography", avgDistSift[i]);
+		if (controller.useSurf() == true) fileManager.writeDistanceToJson(pVec[i] + "_surf_avgDistHom", "avgDistHomography", avgDistSurf[i]);
+		if (controller.useBrisk() == true) fileManager.writeDistanceToJson(pVec[i] + "_brisk_avgDistHom", "avgDistHomography", avgDistBrisk[i]);
+		if (controller.useFreak() == true) fileManager.writeDistanceToJson(pVec[i] + "_freak_avgDistHom", "avgDistHomography", avgDistFreak[i]);
+		if (controller.useOrb() == true) fileManager.writeDistanceToJson(pVec[i] + "_orb_avgDistHom", "avgDistHomography", avgDistOrb[i]);
+	}
+	cout << " > done" << endl;
+
+	// write totalDistHomography to json
+	cout << "write totalDistHomography to json " << " ..." << endl;
+	if (controller.useSift() == true) fileManager.writeDistanceToJson("sift_totalDistHom", "totalDistHomography", totalDistSift);
+	if (controller.useSurf() == true) fileManager.writeDistanceToJson("surf_totalDistHom", "totalDistHomography", totalDistSurf);
+	if (controller.useBrisk() == true) fileManager.writeDistanceToJson("brisk_totalDistHom", "totalDistHomography", totalDistBrisk);
+	if (controller.useFreak() == true) fileManager.writeDistanceToJson("freak_totalDistHom", "totalDistHomography", totalDistFreak);
+	if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_totalDistHom", "totalDistHomography", totalDistOrb);
 	cout << " > done" << endl;
 
 	//cout << "distances: " << endl << avgDistSift << endl << avgDistSurf << endl << avgDistBrisk << endl << avgDistFreak << endl << avgDistOrb << endl;
@@ -424,8 +455,8 @@ int main(int argc, char** argv) {
 
 
 
-	//Test test;
-	//test.test(img1, img2, "Good Matches & Object detection");
+	Test test;
+	test.test(img1, img2, "Good Matches & Object detection");
 
 
 	//keypointDescription.orb(img, img2, H);
