@@ -28,6 +28,7 @@ public:
 	void thresholdFilter(int thresh, vector<DMatch>& matches);
 	void ransacFilter(vector<KeyPoint>& keypointsObject, vector<KeyPoint>& keypointsScene, vector<DMatch>& matches);
 	float homographyFilter(int thresh, vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H);
+	float groundTruthFilter(int thresh, vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H);
 
 private:
 

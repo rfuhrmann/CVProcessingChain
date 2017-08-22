@@ -12,6 +12,10 @@
 #include "opencv2/xfeatures2d.hpp"
 #include "opencv2/highgui.hpp"
 
+#include <OpenEXR/ImfInputFile.h>
+#include <OpenEXR/ImfArray.h>
+//#include <OpenEXR/ImathBox.h>
+
 using namespace cv;
 using namespace cv::xfeatures2d;
 
@@ -151,4 +155,8 @@ float KeypointMatcher::homographyFilter(int thresh, vector<KeyPoint>& keypoints1
 		}
 	}
 	return dTotal;
+}
+
+float KeypointMatcher::groundTruthFilter(int thresh, vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H) {
+	return 1.0;
 }
