@@ -12,8 +12,8 @@
 #include "opencv2/xfeatures2d.hpp"
 #include "opencv2/highgui.hpp"
 
-#include <OpenEXR/ImfInputFile.h>
-#include <OpenEXR/ImfArray.h>
+//#include <OpenEXR/ImfInputFile.h>
+//#include <OpenEXR/ImfArray.h>
 //#include <OpenEXR/ImathBox.h>
 
 using namespace cv;
@@ -111,6 +111,7 @@ void KeypointMatcher::ransacFilter(vector<KeyPoint>& keypointsObject, vector<Key
 		scene.push_back(keypointsScene[matches[i].trainIdx].pt);
 	}
 	Mat H = findHomography(obj, scene, CV_RANSAC, 3.0, ransacMask);
+	//cout << "homography-ransac: " << endl << H << endl;
 	//filter outliers
 	for (int i = matches.size() - 1; i > 0; --i) {
 		if (ransacMask.at(i) == 0) matches.erase(matches.begin() + i);
@@ -152,11 +153,15 @@ float KeypointMatcher::homographyFilter(int thresh, vector<KeyPoint>& keypoints1
 		}
 		else {
 			dTotal += dXY;
+			//cout << (float)(int)((dXY*100)/100)<<", ";
+			cout << round(dXY) << ", ";
 		}
 	}
+	cout << endl;
 	return dTotal;
 }
 
 float KeypointMatcher::groundTruthFilter(int thresh, vector<KeyPoint>& keypoints1, vector<KeyPoint>& keypoints2, vector<DMatch>& matches, Mat H) {
+	
 	return 1.0;
 }

@@ -10,6 +10,7 @@
 #include <opencv2/opencv.hpp>
 #include <opencv2/xphoto/bm3d_image_denoising.hpp>
 #include <opencv2/videostab/deblurring.hpp>
+#include "DeblurAndrey94.h";
 
 
 //The conventional ranges for R, G, and B channel values are :
@@ -160,7 +161,14 @@ return      :  the denoised image
 Mat PreProcessing::deblur(Mat& img) {
 	cout << "deblur..." << endl;
 	Mat img2 = img.clone();
-	videostab::WeightingDeblurer().deblur(1, img2);
+	//videostab::WeightingDeblurer *deblurrer = new videostab::WeightingDeblurer();
+	//deblurrer->deblur(0, img2);
+	//cout << "deblur done" << endl;
+	//cout<< img2.size()<<endl;
+	//*deblurrer.deblur(1, img2);
+	DeblurAndrey94 deblurAndrey94;
+	img2 = deblurAndrey94.deblur(img2);
+	
 	return img2;
 }
 

@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
 	//img1.convertTo(img1, CV_32FC1);
 	//img2.convertTo(img2, CV_32FC1);
 	cout << " > done" << endl;
-
+	
 	// building vectors for preprocessing images including original image
 	vector<Mat> iVec1, iVec2;
 	processingChainHelper.buildPreprocessingVector(iVec1, img1, iVec2, img2);
@@ -303,39 +303,39 @@ int main(int argc, char** argv) {
 	}
 	cout << " > done" << endl;
 
-	// #################### filter by threshold ####################
-	// filter matches by threshold
-	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "filter matches by threshold for " << pVec[i] << " ..." << endl;
-		//cout << "thresh: " << controller.getThreshold() << endl;
-		if (controller.useSift() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecSift[i]);
-		if (controller.useSurf() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecSurf[i]);
-		if (controller.useBrisk() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecBrisk[i]);
-		if (controller.useFreak() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecFreak[i]);
-		if (controller.useOrb() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecOrb[i]);
-	}
-	cout << " > done" << endl;
+	//// #################### filter by threshold ####################
+	//// filter matches by threshold
+	//for (int i = 0; i < pVec.size(); ++i) {
+	//	cout << "filter matches by threshold for " << pVec[i] << " ..." << endl;
+	//	//cout << "thresh: " << controller.getThreshold() << endl;
+	//	if (controller.useSift() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecSift[i]);
+	//	if (controller.useSurf() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecSurf[i]);
+	//	if (controller.useBrisk() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecBrisk[i]);
+	//	if (controller.useFreak() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecFreak[i]);
+	//	if (controller.useOrb() == true) keypointMatcher.thresholdFilter(controller.getMatchThreshold(), matchVecOrb[i]);
+	//}
+	//cout << " > done" << endl;
 
-	// write number of filtered matches to json
-	for (int i = 0; i < pVec.size(); ++i) {
-		cout << "write filteredMatches to json " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) fileManager.writeMatchesToJson(pVec[i] + "_sift_matches", "thresholdMatches", matchVecSift[i]);
-		if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i] + "_surf_matches", "thresholdMatches", matchVecSurf[i]);
-		if (controller.useBrisk() == true) fileManager.writeMatchesToJson(pVec[i] + "_brisk_matches", "thresholdMatches", matchVecBrisk[i]);
-		if (controller.useFreak() == true) fileManager.writeMatchesToJson(pVec[i] + "_freak_matches", "thresholdMatches", matchVecFreak[i]);
-		if (controller.useOrb() == true) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", "thresholdMatches", matchVecOrb[i]);
-	}
-	cout << " > done" << endl;
+	//// write number of filtered matches to json
+	//for (int i = 0; i < pVec.size(); ++i) {
+	//	cout << "write filteredMatches to json " << pVec[i] << " ..." << endl;
+	//	if (controller.useSift() == true) fileManager.writeMatchesToJson(pVec[i] + "_sift_matches", "thresholdMatches", matchVecSift[i]);
+	//	if (controller.useSurf() == true) fileManager.writeMatchesToJson(pVec[i] + "_surf_matches", "thresholdMatches", matchVecSurf[i]);
+	//	if (controller.useBrisk() == true) fileManager.writeMatchesToJson(pVec[i] + "_brisk_matches", "thresholdMatches", matchVecBrisk[i]);
+	//	if (controller.useFreak() == true) fileManager.writeMatchesToJson(pVec[i] + "_freak_matches", "thresholdMatches", matchVecFreak[i]);
+	//	if (controller.useOrb() == true) fileManager.writeMatchesToJson(pVec[i] + "_orb_matches", "thresholdMatches", matchVecOrb[i]);
+	//}
+	//cout << " > done" << endl;
 
 	// #################### filter by ransac ####################
 	// filter matches by ransac
 	for (int i = 0; i < pVec.size(); ++i) {
 		cout << "filter matches by ransac for " << pVec[i] << " ..." << endl;
-		if (controller.useSift() == true) keypointDescription.ransacFilter(kVecSift1[i], kVecSift2[i], matchVecSift[i]);
-		if (controller.useSurf() == true) keypointDescription.ransacFilter(kVecSurf1[i], kVecSurf2[i], matchVecSurf[i]);
-		if (controller.useBrisk() == true) keypointDescription.ransacFilter(kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i]);
-		if (controller.useFreak() == true) keypointDescription.ransacFilter(kVecFreak1[i], kVecFreak2[i], matchVecFreak[i]);
-		if (controller.useOrb() == true) keypointDescription.ransacFilter(kVecOrb1[i], kVecOrb2[i], matchVecOrb[i]);
+		if (controller.useSift() == true) keypointMatcher.ransacFilter(kVecSift1[i], kVecSift2[i], matchVecSift[i]);
+		if (controller.useSurf() == true) keypointMatcher.ransacFilter(kVecSurf1[i], kVecSurf2[i], matchVecSurf[i]);
+		if (controller.useBrisk() == true) keypointMatcher.ransacFilter(kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i]);
+		if (controller.useFreak() == true) keypointMatcher.ransacFilter(kVecFreak1[i], kVecFreak2[i], matchVecFreak[i]);
+		if (controller.useOrb() == true) keypointMatcher.ransacFilter(kVecOrb1[i], kVecOrb2[i], matchVecOrb[i]);
 	}
 	cout << " > done" << endl;
 
@@ -396,14 +396,16 @@ int main(int argc, char** argv) {
 			if (matchVecOrb[i].size() > 0) avgDistOrb.back() = avgDistOrb.back() / matchVecOrb[i].size();
 		}
 	}
-	
+	cout << "TOTALdistORB: " << totalDistOrb << endl;
 	// calculate distance for all values of one detector
 	if (totalMatchesSift > 0) totalDistSift = totalDistSift / totalMatchesSift;
 	if (totalMatchesSurf > 0) totalDistSurf = totalDistSurf / totalMatchesSurf;
 	if (totalMatchesBrisk > 0) totalDistBrisk = totalDistBrisk / totalMatchesBrisk;
 	if (totalMatchesFreak > 0) totalDistFreak = totalDistFreak / totalMatchesFreak;
 	if (totalMatchesOrb > 0) totalDistOrb = totalDistOrb / totalMatchesOrb;
-
+	
+	//totalDistOrb = (float)((int)(totalDistOrb * 1000)) / 1000;
+	
 	/*avgDistSurf = (float)((int)(avgDistSift * 1000)) / 1000;
 	avgDistSurf = (float)((int)(avgDistSurf * 1000)) / 1000;
 	avgDistBrisk = (float)((int)(avgDistBrisk * 1000)) / 1000;
@@ -453,7 +455,13 @@ int main(int argc, char** argv) {
 	//if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_avgDistHom", "avgDistHomography", (round(avgDistOrb * 10000)) / 10000);
 	//cout << " > done" << endl;
 
-
+	/*
+	imshow("blurred", img1);
+	Mat deblurred = img1.clone();
+	deblurred = preProcessing.deblur(img1);
+	imshow("deblurred", deblurred);
+	waitKey(0);
+	*/
 
 	Test test;
 	test.test(img1, img2, "Good Matches & Object detection");
@@ -468,20 +476,23 @@ int main(int argc, char** argv) {
 
 	//vector<KeyPoint> keypoints;
 	//fileManager.writeKeypointsToJson("detektor2", keypoints);
-
+	/*
 	img1 = img.clone();
 
 	imshow("bgr", img1);
 	waitKey(0);
+	*/
 	//cvtColor(img1, img, CV_BGR2GRAY);
 	//cout << img.col(0).row(0) << endl;
 	//imshow("gray", img);
 	//waitKey(0);
 	//cvtColor(img1, img, CV_BGR2Luv);
 	//img1 = preProcessing.bm3d(img1);
+	/*
 	img1 = preProcessing.weightedGray(img1);
 	imshow("bm3d", img1);
 	waitKey(0);
+	*/
 	//cvtColor(img, img, CV_BGR2GRAY);
 	//cout << img.at<float>(0, 0);
 	//for (int y = 0; y < img.rows; ++y) {

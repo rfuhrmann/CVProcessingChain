@@ -84,7 +84,7 @@ vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool s
 	//-- Show detected (drawn) keypoints
 	if (showImage) {
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
-		imshow("Keypoints: " + String(imageName) + "_SURF", img2);
+		imshow("Keypoints: " + String(imageName) + "_FAST", img2);
 	}
 	return keypoints;
 }
