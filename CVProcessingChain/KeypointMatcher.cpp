@@ -15,6 +15,7 @@
 //#include <OpenEXR/ImfInputFile.h>
 //#include <OpenEXR/ImfArray.h>
 //#include <OpenEXR/ImathBox.h>
+//#include <OpenEXR/ImathVec.h>
 
 using namespace cv;
 using namespace cv::xfeatures2d;
@@ -144,8 +145,8 @@ float KeypointMatcher::homographyFilter(int thresh, vector<KeyPoint>& keypoints1
 	
 	// check if correct points in v1 correlate to matched points in v2 -> erase if they don`t
 	for (int i = matches.size() - 1; i >= 0; --i) {
-		dX = abs(v1[i].x - v2[i].x);
-		dY = abs(v1[i].y - v2[i].y);
+		dX = abs((v1[i].x / v1[i].z) - v2[i].x);
+		dY = abs((v1[i].y / v1[i].z) - v2[i].y);
 		dXY = sqrt(dX*dX + dY*dY);
 		//cout << dXY << endl;
 		if (dXY > thresh) {
@@ -153,11 +154,10 @@ float KeypointMatcher::homographyFilter(int thresh, vector<KeyPoint>& keypoints1
 		}
 		else {
 			dTotal += dXY;
-			//cout << (float)(int)((dXY*100)/100)<<", ";
-			cout << round(dXY) << ", ";
+			//cout << round(dXY) << ", ";
 		}
 	}
-	cout << endl;
+	//cout << endl;
 	return dTotal;
 }
 

@@ -31,10 +31,10 @@ bool bm3d = false; //block matching and 3d filtering - gray
 //deconvolution incl. noise estimation
 
 bool sift = false; //Scale-invariant feature transform
-bool surf = false; //Speeded Up Robust Features
+bool surf = true; //Speeded Up Robust Features
 bool brisk = false; //Binary Robust Invariant Scalable Keypoints
 bool freak = false; //Fast REtinA Keypoint - Descriptor only, uses fast detector
-bool orb = true; //Oriented FAST and Rotated BRIEF
+bool orb = false; //Oriented FAST and Rotated BRIEF
 
 //threshold for max distance of a match for thresholdFilter (distance of keypoints)
 int threshMatches = 1000;
