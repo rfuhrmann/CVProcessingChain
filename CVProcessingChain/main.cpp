@@ -396,7 +396,7 @@ int main(int argc, char** argv) {
 			if (matchVecOrb[i].size() > 0) avgDistOrb.back() = avgDistOrb.back() / matchVecOrb[i].size();
 		}
 	}
-	
+	 
 	// calculate distance for all values of one detector
 	if (totalMatchesSift > 0) totalDistSift = totalDistSift / totalMatchesSift;
 	if (totalMatchesSurf > 0) totalDistSurf = totalDistSurf / totalMatchesSurf;
