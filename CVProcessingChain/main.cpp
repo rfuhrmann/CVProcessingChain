@@ -3,11 +3,10 @@
 // Author      : Robert Fuhrmann
 // Version     : 1.0
 // Copyright   : -
-// Description : calls preprocessing, keypoint detectors and test routines
+// Description : calls preprocessing, keypoint detectors, descriptors and test routines
 //============================================================================
 
 #include <iostream>
-
 #include "Controller.h"
 #include "PreProcessing.h"
 #include "DetectionHelper.h"
@@ -18,6 +17,7 @@
 #include "KeypointMatcher.h"
 #include "ProcessingChainHelper.h"
 #include "Test.h"
+#include "colorcvt.h"
 #include <list>
 #include <vector>
 #include <string>
@@ -26,8 +26,12 @@
 using namespace std;
 
 
-// usage: path to image in argv[1]
-// main function. loads image, calls preprocessing routines, calls keypoint detectors, records processing times
+// usage: path to images in argv[1] and argv[2], path to homography in argv[3]
+// main function. 
+//loads images and homography, 
+//calls preprocessing routines, 
+//calls keypoint detectors and descriptors, 
+//calls matching algorithms records measurements
 int main(int argc, char** argv) {
 
 	// check if enough arguments are defined
@@ -48,22 +52,23 @@ int main(int argc, char** argv) {
 	FileManager fileManager;
 	KeypointMatcher keypointMatcher;
 	ProcessingChainHelper processingChainHelper;
+
+	//create empty json file for measurement output, replace file if already exists
 	fileManager.createEmptyJson("output.json");
 
 	// load image, path in argv[1]
 	cout << "load image1" << endl;
-	Mat img1 = imread(argv[1], 1);// CV_LOAD_IMAGE_ANYCOLOR); //CV_LOAD_IMAGE_ANYDEPTH | 0);
+	Mat img1 = imread(argv[1], 1);
 	if (!img1.data) {
 		cout << "ERROR: original image1 not specified" << endl;
 		cout << "Press enter to exit..." << endl;
 		cin.get();
 		return -1;
 	}
-	Mat img = img1.clone();
-	//cvtColor(img, img1, CV_BGR2GRAY);
+
 	// load image, path in argv[2]
 	cout << "load image2" << endl;
-	Mat img2 = imread(argv[2], 1);// CV_LOAD_IMAGE_ANYCOLOR); //CV_LOAD_IMAGE_ANYDEPTH | 0);
+	Mat img2 = imread(argv[2], 1);
 	if (!img2.data) {
 		cout << "ERROR: original image2 not specified" << endl;
 		cout << "Press enter to exit..." << endl;
@@ -72,19 +77,19 @@ int main(int argc, char** argv) {
 	}
 	// load homography, path in argv[3]
 	Mat H = processingChainHelper.loadHomography(argv[3]);
-
-	// convert U8 to 32F
-	//img1.convertTo(img1, CV_32FC1);
-	//img2.convertTo(img2, CV_32FC1);
 	cout << " > done" << endl;
 	
-	// building vectors for preprocessing images including original image
+	//imshow("original", img);
+	//colorcvt color;
+	//color.run(img, "luv");
+
+
+	// building vectors for preprocessing images
 	vector<Mat> iVec1, iVec2;
 	processingChainHelper.buildPreprocessingVector(iVec1, img1, iVec2, img2);
 
 	// vector of all preprocessing steps including original image
 	vector<string> pVec = controller.getPreProcessors();
-
 
 	// #################### detection ####################
 	// building a vector of keypoints for each image in iList
@@ -97,12 +102,8 @@ int main(int argc, char** argv) {
 
 	// #################### description ####################
 	// building a vector of descriptors for each image in iList1
-	//vector<vector<Mat>> descVecSift, descVecSurf, descVecBrisk, descVecFreak, descVecOrb;
 	vector<Mat> dVecSift1, dVecSurf1, dVecBrisk1, dVecFreak1, dVecOrb1;
 	vector<Mat> dVecSift2, dVecSurf2, dVecBrisk2, dVecFreak2, dVecOrb2;
-	//vector<vector<Mat>> helperDescriptors{ dVecSift1, dVecSift2, dVecSurf1, dVecSurf2, dVecBrisk1, dVecBrisk2, dVecFreak1, dVecFreak2, dVecOrb1, dVecOrb2 };
-	//DescriptionHelper descriptionHelper;
-	//descriptionHelper.runDescription(pVec, iVec1, iVec2, helperKeypoints, helperDescriptors);
 	clock_t time;
 	vector<clock_t> tDSift1, tDSift2, tDSurf1, tDSurf2, tDBrisk1, tDBrisk2, tDFreak1, tDFreak2, tDOrb1, tDOrb2;
 
@@ -177,7 +178,7 @@ int main(int argc, char** argv) {
 	}
 	cout << " > done" << endl;
 
-	// #################### match ####################
+	// #################### matching ####################
 	// #################### filter by ratio ####################
 	// building a vector of matches for each image-pair
 	vector<vector<DMatch>> matchVecSift, matchVecSurf, matchVecBrisk, matchVecFreak, matchVecOrb;
@@ -304,6 +305,7 @@ int main(int argc, char** argv) {
 	cout << " > done" << endl;
 
 	//// #################### filter by threshold ####################
+	/// THIS FILTER IS NOT USED DUE TO EXPANTABILITY IN ADVANCE TO PREVIOUS FILTERS
 	//// filter matches by threshold
 	//for (int i = 0; i < pVec.size(); ++i) {
 	//	cout << "filter matches by threshold for " << pVec[i] << " ..." << endl;
@@ -364,32 +366,24 @@ int main(int argc, char** argv) {
 			if (matchVecSift[i].size() > 0) avgDistSift.back() = avgDistSift.back() / matchVecSift[i].size();
 		}
 		if (controller.useSurf() == true) {
-			//totalDistSurf += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSurf1[i], kVecSurf2[i], matchVecSurf[i], H);
-			//totalMatchesSurf += matchVecSurf[i].size();
 			avgDistSurf.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecSurf1[i], kVecSurf2[i], matchVecSurf[i], H));
 			totalDistSurf += avgDistSurf.back();
 			totalMatchesSurf += matchVecSurf[i].size();
 			if (matchVecSurf[i].size() > 0) avgDistSurf.back() = avgDistSurf.back() / matchVecSurf[i].size();
 		}
 		if (controller.useBrisk() == true) {
-			//totalDistBrisk += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i], H);
-			//totalMatchesBrisk += matchVecBrisk[i].size();
 			avgDistBrisk.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecBrisk1[i], kVecBrisk2[i], matchVecBrisk[i], H));
 			totalDistBrisk += avgDistBrisk.back();
 			totalMatchesBrisk += matchVecBrisk[i].size();
 			if (matchVecBrisk[i].size() > 0) avgDistBrisk.back() = avgDistBrisk.back() / matchVecBrisk[i].size();
 		}
 		if (controller.useFreak() == true) {
-			//totalDistFreak += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecFreak1[i], kVecFreak2[i], matchVecFreak[i], H);
-			//totalMatchesFreak += matchVecFreak[i].size();
 			avgDistFreak.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecFreak1[i], kVecFreak2[i], matchVecFreak[i], H));
 			totalDistFreak += avgDistFreak.back();
 			totalMatchesFreak += matchVecFreak[i].size();
 			if (matchVecFreak[i].size() > 0) avgDistFreak.back() = avgDistFreak.back() / matchVecFreak[i].size();
 		}
 		if (controller.useOrb() == true) {
-			//totalDistOrb += keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecOrb1[i], kVecOrb2[i], matchVecOrb[i], H);
-			//totalMatchesOrb += matchVecOrb[i].size();
 			avgDistOrb.push_back(keypointMatcher.homographyFilter(controller.getHomographyThreshold(), kVecOrb1[i], kVecOrb2[i], matchVecOrb[i], H));
 			totalDistOrb += avgDistOrb.back();
 			totalMatchesOrb += matchVecOrb[i].size();
@@ -403,15 +397,6 @@ int main(int argc, char** argv) {
 	if (totalMatchesBrisk > 0) totalDistBrisk = totalDistBrisk / totalMatchesBrisk;
 	if (totalMatchesFreak > 0) totalDistFreak = totalDistFreak / totalMatchesFreak;
 	if (totalMatchesOrb > 0) totalDistOrb = totalDistOrb / totalMatchesOrb;
-	
-	//totalDistOrb = (float)((int)(totalDistOrb * 1000)) / 1000;
-	
-	/*avgDistSurf = (float)((int)(avgDistSift * 1000)) / 1000;
-	avgDistSurf = (float)((int)(avgDistSurf * 1000)) / 1000;
-	avgDistBrisk = (float)((int)(avgDistBrisk * 1000)) / 1000;
-	avgDistFreak = (float)((int)(avgDistFreak * 1000)) / 1000;
-	avgDistOrb = (float)((int)(avgDistOrb * 1000)) / 1000;*/
-
 	cout << " > done" << endl;
 
 	// write realMatches to json
@@ -445,16 +430,6 @@ int main(int argc, char** argv) {
 	if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_totalDistHom", "totalDistHomography", totalDistOrb);
 	cout << " > done" << endl;
 
-	//cout << "distances: " << endl << avgDistSift << endl << avgDistSurf << endl << avgDistBrisk << endl << avgDistFreak << endl << avgDistOrb << endl;
-	//// write avgDistHomography to json
-	//cout << "write avgDistHomography to json " << " ..." << endl;
-	//if (controller.useSift() == true) fileManager.writeDistanceToJson("sift_avgDistHom", "avgDistHomography", (round(avgDistSift*10000))/10000);
-	//if (controller.useSurf() == true) fileManager.writeDistanceToJson("surf_avgDistHom", "avgDistHomography", (round(avgDistSurf * 10000)) / 10000);
-	//if (controller.useBrisk() == true) fileManager.writeDistanceToJson("brisk_avgDistHom", "avgDistHomography", (round(avgDistBrisk * 10000)) / 10000);
-	//if (controller.useFreak() == true) fileManager.writeDistanceToJson("freak_avgDistHom", "avgDistHomography", (round(avgDistFreak * 10000)) / 10000);
-	//if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_avgDistHom", "avgDistHomography", (round(avgDistOrb * 10000)) / 10000);
-	//cout << " > done" << endl;
-
 	/*
 	imshow("blurred", img1);
 	Mat deblurred = img1.clone();
@@ -463,55 +438,12 @@ int main(int argc, char** argv) {
 	waitKey(0);
 	*/
 
-	Test test;
-	test.test(img1, img2, "Good Matches & Object detection");
+	//Test test;
+	//test.test(img1, img2, "Good Matches & Object detection");
 
 
-	//keypointDescription.orb(img, img2, H);
-	//keypointDescription.brisk(img, img2);
-	//keypointDescription.sift(img, img2);
-	//keypointDescription.freak(img, img2);
-
-
-
-	//vector<KeyPoint> keypoints;
-	//fileManager.writeKeypointsToJson("detektor2", keypoints);
-	/*
-	img1 = img.clone();
-
-	imshow("bgr", img1);
+	imshow("img1", img1);
 	waitKey(0);
-	*/
-	//cvtColor(img1, img, CV_BGR2GRAY);
-	//cout << img.col(0).row(0) << endl;
-	//imshow("gray", img);
-	//waitKey(0);
-	//cvtColor(img1, img, CV_BGR2Luv);
-	//img1 = preProcessing.bm3d(img1);
-	/*
-	img1 = preProcessing.weightedGray(img1);
-	imshow("bm3d", img1);
-	waitKey(0);
-	*/
-	//cvtColor(img, img, CV_BGR2GRAY);
-	//cout << img.at<float>(0, 0);
-	//for (int y = 0; y < img.rows; ++y) {
-	//	for (int x = 0; x < img.cols; ++x) {
-	//		//img.col(x).row(y).data[0] = 0; //blue (0, img.col(x).row(y).data[1], 0);//Point3d(img.at<Point3d>(x, y).x,0,0); img.col(x).row(y).data[0]
-	//		img.col(x).row(y).data[1] = 0; //green
-	//		img.col(x).row(y).data[2] = 0; //red
-	//	}
-	//}
-	//vector<Mat> planes, planes2;
-	////Mat plan[3];
-	//split(img, planes);
-	////split(img, plan);
-	//imshow("luv", planes[0]);
-	//waitKey(0);
-	//cvtColor(img1, img, CV_BGR2YCrCb);
-	//split(img, planes2);
-	//imshow("ycbcr", planes2[0]);
-	//waitKey(0);
 
 	return 0;
 }

@@ -1,0 +1,85 @@
+{
+  "keypoints": {
+    "lab_sift_keypoints_1": 2865,
+    "lab_sift_keypoints_2": 3881,
+    "lab_surf_keypoints_1": 4985,
+    "lab_surf_keypoints_2": 5949,
+    "lab_brisk_keypoints_1": 3935,
+    "lab_brisk_keypoints_2": 5674,
+    "lab_orb_keypoints_1": 1000,
+    "lab_orb_keypoints_2": 1000
+  },
+  "crosscheckMatches": {
+    "lab_sift_matches": 1995,
+    "lab_surf_matches": 2880,
+    "lab_brisk_matches": 2611,
+    "lab_orb_matches": 563
+  },
+  "ratioMatches": {
+    "lab_sift_matches": 499,
+    "lab_surf_matches": 276,
+    "lab_brisk_matches": 340,
+    "lab_orb_matches": 88
+  },
+  "thresholdMatches": { },
+  "ransacInliers": {
+    "lab_sift_matches": 308,
+    "lab_surf_matches": 136,
+    "lab_brisk_matches": 215,
+    "lab_orb_matches": 63
+  },
+  "realMatches": {
+    "lab_sift_realMatches": 307,
+    "lab_surf_realMatches": 136,
+    "lab_brisk_realMatches": 215,
+    "lab_orb_realMatches": 63
+  },
+  "avgDistHomography": {
+    "lab_sift_avgDistHom": 0.9996644258499146,
+    "lab_surf_avgDistHom": 1.4248523712158204,
+    "lab_brisk_avgDistHom": 1.164204478263855,
+    "lab_orb_avgDistHom": 1.3049405813217164
+  },
+  "totalDistHomography": {
+    "sift_totalDistHom": 0.9996644258499146,
+    "surf_totalDistHom": 1.4248523712158204,
+    "brisk_totalDistHom": 1.164204478263855,
+    "orb_totalDistHom": 1.3049405813217164
+  },
+  "preprocessingTimer": {
+    "lab1_preprocessingTime": 0.03,
+    "lab2_preprocessingTime": 0.036
+  },
+  "detectorTimer": {
+    "lab_sift1_detectionTime": 1.518,
+    "lab_sift2_detectionTime": 1.54,
+    "lab_surf1_detectionTime": 0.919,
+    "lab_surf2_detectionTime": 0.919,
+    "lab_brisk1_detectionTime": 3.682,
+    "lab_brisk2_detectionTime": 4.013,
+    "lab_orb1_detectionTime": 0.45,
+    "lab_orb2_detectionTime": 0.511
+  },
+  "descriptorTimer": {
+    "lab_sift1_descriptionTime": 1.245,
+    "lab_sift2_descriptionTime": 1.497,
+    "lab_surf1_descriptionTime": 3.502,
+    "lab_surf2_descriptionTime": 3.502,
+    "lab_brisk1_descriptionTime": 3.702,
+    "lab_brisk2_descriptionTime": 3.603,
+    "lab_orb1_descriptionTime": 0.095,
+    "lab_orb2_descriptionTime": 0.081
+  },
+  "ratioMatchTimer": {
+    "lab_sift_matchTime": 1.844,
+    "lab_surf_matchTime": 2.839,
+    "lab_brisk_matchTime": 5.908,
+    "lab_orb_matchTime": 0.174
+  },
+  "crosscheckMatchTimer": {
+    "lab_sift_matchTime": 1.942,
+    "lab_surf_matchTime": 2.694,
+    "lab_brisk_matchTime": 5.423,
+    "lab_orb_matchTime": 0.16
+  }
+}

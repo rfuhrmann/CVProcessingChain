@@ -33,7 +33,7 @@ vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool s
 	//img2.convertTo(img2, CV_8UC1);
 	//-- Step 1: Detect the keypoints using SURF Detector
 	//int minHessian = 400;
-	Ptr<SIFT> detector = SIFT::create(0);
+	Ptr<SIFT> detector = SIFT::create();
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
 	//-- Show detected (drawn) keypoints
@@ -98,8 +98,6 @@ return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	//img2.convertTo(img2, CV_8UC1);
-	//-- Step 1: Detect the keypoints using SURF Detector
 	Ptr<BRISK> detector = BRISK::create();
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);

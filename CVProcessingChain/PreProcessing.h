@@ -38,11 +38,6 @@ class PreProcessing{
 	  Mat deblur(Mat&);//deblurring
 
 	  //convert image to 
-	  
-
-      // function headers of given functions
-      Mat degradeImage(Mat& img, Mat& degradedImg, double filterDev, double snr);
-      void showImage(const char* win, Mat img, bool cut=true);
 
    private:
     
