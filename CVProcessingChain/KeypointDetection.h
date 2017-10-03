@@ -20,7 +20,6 @@ public:
 	KeypointDetection(void){};
 	// destructor
 	~KeypointDetection(void){};
-	void test(void);
 	//vector<Mat> run(Mat&, const char* imageName, bool showImage, bool writeFile);
 	vector<KeyPoint> sift(Mat& img, const char* imageName, bool showImage);
 	vector<KeyPoint> surf(Mat& img, const char* imageName, bool showImage);

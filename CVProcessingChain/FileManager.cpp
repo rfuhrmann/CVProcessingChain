@@ -20,120 +20,108 @@ using namespace rapidjson;
 
 string fileName;
 
-// write #keypoints and keypoints to json
+// write #keypoints to json file
 /*
-in                   :  name/path in json
-					 :  keypoints
-return               :  
+path            :  string/path in json
+keypoints		:  keypoints
 */
 void FileManager::writeKeypointsToJson(string path, vector<KeyPoint>& keypoints) {
 
 	int kpSize = keypoints.size();
-	// if (kpSize < 1) return;
-	//string json = "{\"detector\":\"" + path + "\",\"stars\":10}";
-	// 1. Parse a JSON string into DOM.
-	
-	//string jsonTmp = "{\"detector\":\"" + path + "\",\"keypoints\":" + to_string(kpSize) + "}";
-	//const char* json = jsonTmp.c_str();
 	Document doc;
 	loadJsonToDocument(::fileName, doc);
-	//d.SetObject(); //needed if creating new doc, without loading file
 	Document::AllocatorType& allocator = doc.GetAllocator();
 
 	//########## create object ##########
 	Value kpObject(kObjectType);
-	//Value kpArray(kArrayType);
 	Value kpName;
 	kpName.SetString(path.c_str(), allocator);
-	//kpObject.AddMember(kpName, 100, allocator);
-	
-	//########## create array ##########
-	//Value array(rapidjson::kArrayType);
-	//array.PushBack("hello", allocator).PushBack("world", allocator);
-
-	//Value& points = doc["keypoints"].AddMember(kpName, keypoints.size(), allocator);
 
 	doc["keypoints"].AddMember(kpName, keypoints.size(), allocator);
-
 	writeJsonFromDocument(::fileName, doc);
 }
 
-// write #matches and matches to json
+// write #matches to json file
 /*
-in                   :  name/path in json
-					 :  matches
-return               :
+path            :  string/path in json
+object          :  object in json
+matches 		:  matches
 */
 void FileManager::writeMatchesToJson(string path, string object, vector<DMatch>& matches) {
 
-	//int kpSize = matches.size();
 	Document doc;
 	loadJsonToDocument(::fileName, doc);
-	//d.SetObject(); //needed if creating new doc, without loading file
 	Document::AllocatorType& allocator = doc.GetAllocator();
 
 	//########## create object ##########
 	Value mObject(kObjectType);
 	Value mName;
 	mName.SetString(path.c_str(), allocator);
-	doc[object.c_str()].AddMember(mName, matches.size(), allocator);
 
+	doc[object.c_str()].AddMember(mName, matches.size(), allocator);
 	writeJsonFromDocument(::fileName, doc);
 }
 
-// write distance to json
+// write distance to json file
 /*
-in                   :  name/path in json
-					 :  distance
-return               :
+path            :  string/path in json
+object          :  object in json
+distance 		:  distance
 */
 void FileManager::writeDistanceToJson(string path, string object, float distance){
 
 	Document doc;
 	loadJsonToDocument(::fileName, doc);
-	//d.SetObject(); //needed if creating new doc, without loading file
 	Document::AllocatorType& allocator = doc.GetAllocator();
 
 	//########## create object ##########
 	Value mObject(kObjectType);
 	Value mName;
 	mName.SetString(path.c_str(), allocator);
-	doc[object.c_str()].AddMember(mName, distance, allocator);
 
+	doc[object.c_str()].AddMember(mName, distance, allocator);
 	writeJsonFromDocument(::fileName, doc);
 }
 
-// write #Times to json
+// write time to json file
 /*
-in                   :  name/path in json
-:  matches
-return               :
+path            :  string/path in json
+object          :  object in json
+time	 		:  time
 */
 void FileManager::writeTimeToJson(string path, string object, clock_t time) {
+
 	Document doc;
 	loadJsonToDocument(::fileName, doc);
-	//d.SetObject(); //needed if creating new doc, without loading file
 	Document::AllocatorType& allocator = doc.GetAllocator();
 
 	//########## create object ##########
 	Value tObject(kObjectType);
 	Value tName;
 	tName.SetString(path.c_str(), allocator);
-	doc[object.c_str()].AddMember(tName, (double)time / CLOCKS_PER_SEC, allocator);
 
+	doc[object.c_str()].AddMember(tName, (double)time / CLOCKS_PER_SEC, allocator);
 	writeJsonFromDocument(::fileName, doc);
 }
 
-
+// load json file and store in a temporary document for editing
+/*
+path            :  path of json file
+doc				:  temporary document
+*/
 void FileManager::loadJsonToDocument(string path, Document& doc) {
-	FILE* fp = fopen(path.c_str(), "rb"); // non-Windows use "r"
+	FILE* fp = fopen(path.c_str(), "rb");
 	char readBuffer[65536];
 	FileReadStream is(fp, readBuffer, sizeof(readBuffer));
-	//Document d;
 	doc.ParseStream(is);
 	fclose(fp);
 }
 
+// write temporary document to json file
+/*
+path            :  path of json file
+doc				:  temporary document
+*/
 void FileManager::writeJsonFromDocument(string path, Document& doc) {
 	FILE* fp = fopen(path.c_str(), "wb"); // non-Windows use "w"
 	char writeBuffer[65536];
@@ -143,6 +131,10 @@ void FileManager::writeJsonFromDocument(string path, Document& doc) {
 	fclose(fp);
 }
 
+// create and save an json file with all propably needed but empty objects
+/*
+path            :  path of json file
+*/
 void FileManager::createEmptyJson(string path) {
 	::fileName = path;
 	Document doc;

@@ -16,30 +16,41 @@ vector<string> preProcessors;
 vector<string> keypointDetectors;
 list<string> keypointFiles;
 
+// #####################################################################
+// #################### START SETTINGS FOR NEXT RUN ####################
+// #####################################################################
+// ############# options for the next run need to be TRUE ##############
+// ######### options which should be avoided need to be FALSE ##########
+// #####################################################################
+
 bool original = false; //the original image, maybe color, not used
-bool gray = false; //rgb color space for greyscale conversion
+bool gray = true; //rgb color space for greyscale conversion
 bool weightedGray = false; //rgb color space for weighted greyscale conversion
 bool yCrCb = false; //YCrCb color space for greyscale conversion
 bool luv = true; //Luv color space for greyscale conversion
 bool lab = false; //Lab color space for greyscale conversion
 
-bool histEqual = false; //histogram equalization, global contrast enhancement - gray
-bool clahe = false; //clahe filter, Contrast Limited Adaptive Histogram Equalization - gray
-bool bilateral = false; //bilateral filter, blurring - rgb
-bool nlm = false; //non local mean filter, blurring - rgb
+bool histEqual = true; //histogram equalization, global contrast enhancement - gray
+bool clahe = true; //clahe filter, Contrast Limited Adaptive Histogram Equalization - gray
+bool bilateral = true; //bilateral filter, blurring - rgb
+bool nlm = true; //non local mean filter, blurring - rgb
 bool bm3d = false; //block matching and 3d filtering - gray
 //deconvolution incl. noise estimation
 
-bool sift = true; //Scale-invariant feature transform
-bool surf = false; //Speeded Up Robust Features
+bool sift = false; //Scale-invariant feature transform
+bool surf = true; //Speeded Up Robust Features
 bool brisk = false; //Binary Robust Invariant Scalable Keypoints
 bool freak = false; //Fast REtinA Keypoint - Descriptor only, uses fast detector
-bool orb = false; //Oriented FAST and Rotated BRIEF
+bool orb = true; //Oriented FAST and Rotated BRIEF
 
 //threshold for max distance of a match for thresholdFilter (distance of keypoints)
 int threshMatches = 1000;
 //threshold for max distance of a match for homographyFilter (distance of deskriptor points)
 int threshHomography = 9;
+
+// ###################################################################
+// #################### END SETTINGS FOR NEXT RUN ####################
+// ###################################################################
 
 Controller::Controller()
 {

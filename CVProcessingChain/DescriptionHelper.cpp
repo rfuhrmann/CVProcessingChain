@@ -15,6 +15,10 @@ DescriptionHelper::~DescriptionHelper()
 {
 }
 
+// calls description methods
+/*
+
+*/
 void DescriptionHelper::runDescription(
 	vector<string> &pVec,
 	vector<Mat> &iVec1,

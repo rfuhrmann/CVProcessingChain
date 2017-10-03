@@ -12,30 +12,24 @@
 #include "opencv2/features2d.hpp"
 #include "opencv2/xfeatures2d.hpp"
 #include "opencv2/highgui.hpp"
-//#include "windows.h"
 
 using namespace cv;
 using namespace cv::xfeatures2d;
 
- void KeypointDetection::test() {
-	//cout << "inside KeypointDetection ..." << endl;
-
-}
-
-// surf keypoint detection
+// sift keypoint detection
 // scale-invariant feature transform
 /*
 img         :  input image
+imageName	:  for imshow window
+showImage	:  if image should be shown
 return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	//img2.convertTo(img2, CV_8UC1);
-	//-- Step 1: Detect the keypoints using SURF Detector
-	//int minHessian = 400;
 	Ptr<SIFT> detector = SIFT::create();
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
+
 	//-- Show detected (drawn) keypoints
 	if (showImage) {
 		drawKeypoints(img2, keypoints, img2, Scalar::all(-1), DrawMatchesFlags::DEFAULT);
@@ -48,13 +42,12 @@ vector<KeyPoint> KeypointDetection::sift(Mat& img, const char* imageName, bool s
 // speeded up robust features
 /*
 img         :  input image
+imageName	:  for imshow window
+showImage	:  if image should be shown
 return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	//img2.convertTo(img2, CV_8UC1);
-	//-- Step 1: Detect the keypoints using SURF Detector
-	//int minHessian = 400;
 	Ptr<SURF> detector = SURF::create(100);
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
@@ -68,17 +61,16 @@ vector<KeyPoint> KeypointDetection::surf(Mat& img, const char* imageName, bool s
 }
 
 // fast keypoint detection
-// Features from accelerated segment test
+// features from accelerated segment test
 /*
 img         :  input image
+imageName	:  for imshow window
+showImage	:  if image should be shown
 return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	//img2.convertTo(img2, CV_8UC1);
-	//-- Step 1: Detect the keypoints using SURF Detector
 	vector<KeyPoint> keypoints;
-	//FAST(img2, keypoints, 40, true);
 	FAST(img2, keypoints, 40, true);
 	
 	//-- Show detected (drawn) keypoints
@@ -90,10 +82,12 @@ vector<KeyPoint> KeypointDetection::fast(Mat& img, const char* imageName, bool s
 }
 
 
-// mser keypoint detection
-//Binary Robust Invariant Scalable Keypoints
+// brisk keypoint detection
+// Binary Robust Invariant Scalable Keypoints
 /*
 img         :  input image
+imageName	:  for imshow window
+showImage	:  if image should be shown
 return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool showImage) {
@@ -110,17 +104,16 @@ vector<KeyPoint> KeypointDetection::brisk(Mat& img, const char* imageName, bool 
 	return keypoints;
 }
 
-  
 // orb keypoint detection
-//Oriented FAST and Rotated BRIEF
+// Oriented FAST and Rotated BRIEF
 /*
 img         :  input image
+imageName	:  for imshow window
+showImage	:  if image should be shown
 return      :  the result image
 */
 vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool showImage) {
 	Mat img2 = img.clone();
-	//img2.convertTo(img2, CV_8UC1);
-	//-- Step 1: Detect the keypoints using SURF Detector
 	Ptr<ORB> detector = ORB::create(1000);
 	vector<KeyPoint> keypoints;
 	detector->detect(img2, keypoints);
@@ -135,10 +128,9 @@ vector<KeyPoint> KeypointDetection::orb(Mat& img, const char* imageName, bool sh
 
 // Function prints keypoints to the std::cout (console)
 /*
-kp		   :  keypoints
+kp		   :  keypoints for printing
 */
 void KeypointDetection::printKeypoints(vector<KeyPoint> kp) {
-	//cout << "anz kp ..."<<kp.size()<<endl;
 	cout << "surf keypoints ...";
 	int kpSize = kp.size();
 	for (int i = 0; i < kpSize; i++) {
@@ -150,20 +142,19 @@ void KeypointDetection::printKeypoints(vector<KeyPoint> kp) {
 // Function write create or overwrite a file and write keypoints
 /*
 filename   :  filename for writing
-kp		   :  keypoints
+kp		   :  keypoints for writing
 */
 void KeypointDetection::writeKeypoints(const char* filename, vector<KeyPoint> kp) {
 	int kpSize = kp.size();
 	if(kpSize < 1) return;
-	ofstream(String(filename));// .c_str());
+	ofstream(String(filename));
 	fstream f;
-	f.open(String(filename)/*.c_str()*/, ios::out);
+	f.open(String(filename), ios::out);
 	for (int i = 0; i < kpSize-1; i++) {
 		f << kp[i].pt.x << "-" << kp[i].pt.y << ",";
 	}
 	f << kp[kpSize-1].pt.x << "-" << kp[kpSize-1].pt.y;
 	f.close();
-	//cout << " > writing " << filename/*.c_str()*/ << " done." << endl;
 }
 
 // Function displays image with keypoints (after proper normalization)
