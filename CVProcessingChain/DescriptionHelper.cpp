@@ -1,3 +1,11 @@
+//============================================================================
+// Name        : DescriptionHelper.cpp
+// Author      : Robert Fuhrmann
+// Version     : 1.0
+// Copyright   : -
+// Description : provids helper functions for description
+//============================================================================
+
 #include <iostream>
 #include "DescriptionHelper.h"
 #include "KeypointDescription.h"

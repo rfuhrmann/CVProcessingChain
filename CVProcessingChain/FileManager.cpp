@@ -3,7 +3,7 @@
 // Author      : Robert Fuhrmann
 // Version     : 1.0
 // Copyright   : -
-// Description : provedes FileManager functions
+// Description : provedes functions for file input and output 
 //============================================================================
 
 #include "FileManager.h"

@@ -3,21 +3,19 @@
 // Author      : Robert Fuhrmann
 // Version     : 1.0
 // Copyright   : -
-// Description : calls preprocessing, keypoint detectors, descriptors and test routines
+// Description : calls preprocessing, keypoint detectors, descriptors, Matcher and test routines
 //============================================================================
 
 #include <iostream>
 #include "Controller.h"
 #include "PreProcessing.h"
 #include "DetectionHelper.h"
-#include "DescriptionHelper.h"
+//#include "DescriptionHelper.h"
 #include "KeypointDetection.h"
 #include "KeypointDescription.h"
 #include "FileManager.h"
 #include "KeypointMatcher.h"
 #include "ProcessingChainHelper.h"
-#include "Test.h"
-#include "colorcvt.h"
 #include <list>
 #include <vector>
 #include <string>
@@ -52,6 +50,7 @@ int main(int argc, char** argv) {
 	FileManager fileManager;
 	KeypointMatcher keypointMatcher;
 	ProcessingChainHelper processingChainHelper;
+	DetectionHelper detectionHelper;
 
 	//create empty json file for measurement output, replace file if already exists
 	fileManager.createEmptyJson("output.json");
@@ -65,7 +64,6 @@ int main(int argc, char** argv) {
 		cin.get();
 		return -1;
 	}
-
 	// load image, path in argv[2]
 	cout << "load image2" << endl;
 	Mat img2 = imread(argv[2], 1);
@@ -78,25 +76,19 @@ int main(int argc, char** argv) {
 	// load homography, path in argv[3]
 	Mat H = processingChainHelper.loadHomography(argv[3]);
 	cout << " > done" << endl;
-	
-	//imshow("original", img);
-	//colorcvt color;
-	//color.run(img, "luv");
 
-
-	// building vectors for preprocessing images
+	// build vectors for preprocessing images
 	vector<Mat> iVec1, iVec2;
 	processingChainHelper.buildPreprocessingVector(iVec1, img1, iVec2, img2);
 
-	// vector of all preprocessing steps including original image
+	// build vector of all preprocessing steps including original image
 	vector<string> pVec = controller.getPreProcessors();
 
 	// #################### detection ####################
-	// building a vector of keypoints for each image in iList
+	// building vector of keypoints for each image in iList
 	vector<vector<KeyPoint>> kVecSift1, kVecSurf1, kVecBrisk1, kVecFreak1, kVecOrb1;
 	vector<vector<KeyPoint>> kVecSift2, kVecSurf2, kVecBrisk2, kVecFreak2, kVecOrb2;
-	vector<vector<vector<KeyPoint>>> helperKeypoints{kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2};
-	DetectionHelper detectionHelper;
+	//vector<vector<vector<KeyPoint>>> helperKeypoints{ kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2 };
 	detectionHelper.runDetection(pVec, iVec1, iVec2, kVecSift1, kVecSift2, kVecSurf1, kVecSurf2, kVecBrisk1, kVecBrisk2, kVecFreak1, kVecFreak2, kVecOrb1, kVecOrb2);
 
 
@@ -104,6 +96,7 @@ int main(int argc, char** argv) {
 	// building a vector of descriptors for each image in iList1
 	vector<Mat> dVecSift1, dVecSurf1, dVecBrisk1, dVecFreak1, dVecOrb1;
 	vector<Mat> dVecSift2, dVecSurf2, dVecBrisk2, dVecFreak2, dVecOrb2;
+	// objects for time measurement
 	clock_t time;
 	vector<clock_t> tDSift1, tDSift2, tDSurf1, tDSurf2, tDBrisk1, tDBrisk2, tDFreak1, tDFreak2, tDOrb1, tDOrb2;
 
@@ -182,6 +175,7 @@ int main(int argc, char** argv) {
 	// #################### filter by ratio ####################
 	// building a vector of matches for each image-pair
 	vector<vector<DMatch>> matchVecSift, matchVecSurf, matchVecBrisk, matchVecFreak, matchVecOrb;
+	// objects for time measurement
 	vector<clock_t> tRatioSift, tRatioSurf, tRatioBrisk, tRatioFreak, tRatioOrb;
 
 	for (int i = 0; i < pVec.size(); ++i) {
@@ -217,6 +211,7 @@ int main(int argc, char** argv) {
 
 	// #################### filter by crosscheck ####################
 	vector<vector<DMatch>> crossVecSift, crossVecSurf, crossVecBrisk, crossVecFreak, crossVecOrb;
+	// objects for time measurement
 	vector<clock_t> tCrossSift, tCrossSurf, tCrossBrisk, tCrossFreak, tCrossOrb;
 
 	for (int i = 0; i < pVec.size(); ++i) {
@@ -390,7 +385,7 @@ int main(int argc, char** argv) {
 			if (matchVecOrb[i].size() > 0) avgDistOrb.back() = avgDistOrb.back() / matchVecOrb[i].size();
 		}
 	}
-	 
+
 	// calculate distance for all values of one detector
 	if (totalMatchesSift > 0) totalDistSift = totalDistSift / totalMatchesSift;
 	if (totalMatchesSurf > 0) totalDistSurf = totalDistSurf / totalMatchesSurf;
@@ -430,20 +425,49 @@ int main(int argc, char** argv) {
 	if (controller.useOrb() == true) fileManager.writeDistanceToJson("orb_totalDistHom", "totalDistHomography", totalDistOrb);
 	cout << " > done" << endl;
 
-	/*
-	imshow("blurred", img1);
-	Mat deblurred = img1.clone();
-	deblurred = preProcessing.deblur(img1);
-	imshow("deblurred", deblurred);
+
+
+	//img1 = preProcessing.gray(img1);
+	imshow("InputImage1", img1);
 	waitKey(0);
-	*/
 
-	//Test test;
-	//test.test(img1, img2, "Good Matches & Object detection");
+	////########## show histogram ##########
+	//Mat gray = preProcessing.lab(img1);
+	//namedWindow("Gray", 1);    imshow("Gray", gray);
 
+	//// Initialize parameters
+	//int histSize = 256;    // bin size
+	//float range[] = { 0, 255 };
+	//const float *ranges[] = { range };
 
-	imshow("img1", img1);
-	waitKey(0);
+	//// Calculate histogram
+	//MatND hist;
+	//calcHist(&gray, 1, 0, Mat(), hist, 1, &histSize, ranges, true, false);
+
+	//// Show the calculated histogram in command window
+	//double total;
+	//total = gray.rows * gray.cols;
+	//for (int h = 0; h < histSize; h++)
+	//{
+	//	float binVal = hist.at<float>(h);
+	//	cout << " " << binVal;
+	//}
+
+	//// Plot the histogram
+	//int hist_w = 512; int hist_h = 400;
+	//int bin_w = cvRound((double)hist_w / histSize);
+
+	//Mat histImage(hist_h, hist_w, CV_8UC1, Scalar(0, 0, 0));
+	//normalize(hist, hist, 0, histImage.rows, NORM_MINMAX, -1, Mat());
+
+	//for (int i = 1; i < histSize; i++)
+	//{
+	//	line(histImage, Point(bin_w*(i - 1), hist_h - cvRound(hist.at<float>(i - 1))),
+	//		Point(bin_w*(i), hist_h - cvRound(hist.at<float>(i))),
+	//		Scalar(255, 0, 0), 2, 8, 0);
+	//}
+
+	//namedWindow("Result", 1);    imshow("wall_img1", histImage);
 
 	return 0;
 }

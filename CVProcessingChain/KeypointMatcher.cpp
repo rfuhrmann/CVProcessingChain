@@ -24,7 +24,6 @@ descriptors2         :  descriptor for keypoints from image 2
 return				 :  matches which could be found and passed the filter
 */
 vector<DMatch> KeypointMatcher::crosscheckMatcher(int type, Mat& descriptors1, Mat& descriptors2) {
-	//vector<vector<DMatch>> matches;
 	vector<DMatch> goodMatches;
 	BFMatcher matcher(type, true);
 	matcher.match(descriptors1, descriptors2, goodMatches);
@@ -82,7 +81,6 @@ return			:  matches with distance <= thresh
 */
 void KeypointMatcher::thresholdFilter(int thresh, vector<DMatch>& matches) {
 	for (int i = matches.size()-1; i >= 0; --i) {
-		
 		if (matches[i].distance > thresh) matches.erase(matches.begin() + i);
 	}
 }

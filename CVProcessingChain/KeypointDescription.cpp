@@ -17,22 +17,19 @@
 using namespace cv;
 using namespace cv::xfeatures2d;
 
-
-//###################################### single image #################################################
-
 // sift keypoint description
 // scale-invariant feature transform
 /*
 img         :  input image
 kp			:  keypoints which should be described
-return      :  the result image
+return      :  the description of the image
 */
 Mat KeypointDescription::sift(Mat& img, vector<KeyPoint> kp) {
 	img.convertTo(img, CV_8UC1);
 	Ptr<SIFT> detector = SIFT::create();
-	Mat descriptors;
-	detector->compute(img, kp, descriptors);
-	return descriptors;
+	Mat description;
+	detector->compute(img, kp, description);
+	return description;
 }
 
 // surf keypoint description
@@ -40,14 +37,14 @@ Mat KeypointDescription::sift(Mat& img, vector<KeyPoint> kp) {
 /*
 img         :  input image
 kp			:  keypoints which should be described
-return      :  the result image
+return      :  the description of the image
 */
 Mat KeypointDescription::surf(Mat& img, vector<KeyPoint> kp) {
 	img.convertTo(img, CV_8UC1);
 	Ptr<SURF> detector = SURF::create();
-	Mat descriptors;
-	detector->compute(img, kp, descriptors);
-	return descriptors;
+	Mat description;
+	detector->compute(img, kp, description);
+	return description;
 }
 
 // freak keypoint description
@@ -55,14 +52,14 @@ Mat KeypointDescription::surf(Mat& img, vector<KeyPoint> kp) {
 /*
 img         :  input image
 kp			:  keypoints which should be described
-return      :  the result image
+return      :  the description of the image
 */
 Mat KeypointDescription::freak(Mat& img, vector<KeyPoint> kp) {
 	img.convertTo(img, CV_8UC1);
 	Ptr<FREAK> detector = FREAK::create();
-	Mat descriptors;
-	detector->compute(img, kp, descriptors);
-	return descriptors;
+	Mat description;
+	detector->compute(img, kp, description);
+	return description;
 }
 
 // brisk keypoint description
@@ -70,14 +67,14 @@ Mat KeypointDescription::freak(Mat& img, vector<KeyPoint> kp) {
 /*
 img         :  input image
 kp			:  keypoints which should be described
-return      :  the result image
+return      :  the description of the image
 */
 Mat KeypointDescription::brisk(Mat& img, vector<KeyPoint> kp) {
 	img.convertTo(img, CV_8UC1);
 	Ptr<BRISK> detector = BRISK::create();
-	Mat descriptors;
-	detector->compute(img, kp, descriptors);
-	return descriptors;
+	Mat description;
+	detector->compute(img, kp, description);
+	return description;
 }
 
 // orb keypoint description
@@ -85,13 +82,13 @@ Mat KeypointDescription::brisk(Mat& img, vector<KeyPoint> kp) {
 /*
 img         :  input image
 kp			:  keypoints which should be described
-return      :  the result image
+return      :  the description of the image
 */
 Mat KeypointDescription::orb(Mat& img, vector<KeyPoint> kp) {
 	img.convertTo(img, CV_8UC1);
 	Ptr<ORB> detector = ORB::create();
-	Mat descriptors;
-	detector->compute(img, kp, descriptors);
-	return descriptors;
+	Mat description;
+	detector->compute(img, kp, description);
+	return description;
 }
 

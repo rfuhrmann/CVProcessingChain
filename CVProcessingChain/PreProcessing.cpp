@@ -145,15 +145,8 @@ img         :  input image
 return      :  the denoised image
 */
 Mat PreProcessing::deblur(Mat& img) {
-	cout << "deblur..." << endl;
+	cout << "blind deblur is not implemented yet..." << endl;
 	Mat img2 = img.clone();
-	//videostab::WeightingDeblurer *deblurrer = new videostab::WeightingDeblurer();
-	//deblurrer->deblur(0, img2);
-	//cout << "deblur done" << endl;
-	//cout<< img2.size()<<endl;
-	//*deblurrer.deblur(1, img2);
-	DeblurAndrey94 deblurAndrey94;
-	img2 = deblurAndrey94.deblur(img2);
 	return img2;
 }
 
